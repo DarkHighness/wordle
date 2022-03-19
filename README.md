@@ -1,16 +1,38 @@
-# wordle
+# Wordle
 
-A new Flutter project.
+一个针对中文成语和诗词的 Wordle
 
-## Getting Started
+## 特点:
 
-This project is a starting point for a Flutter application.
+* 同时支持成语和诗词的 Wordle
 
-A few resources to get you started if this is your first Flutter project:
+* 全离线使用, 不用担心任何记录信息
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+* 做不出来轻松 hack, 点放弃也能继续做
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+* 代码真的写的很辣鸡
+
+## 截图:
+
+![S1](./screenshots/Screenshot_1.jpg)
+
+![S2](./screenshots/Screenshot_2.jpg)
+
+![S3](./screenshots/Screenshot_3.jpg)
+
+## TODO:
+
+* 个人本地统计数据支持
+
+* 分享题目 ID 后自动唤醒并跳转
+
+* 丰富词库/诗词集, 补全诗词集缺失内容
+
+* 重构代码
+
+## 备注:
+
+* 数据来源自
+  * [中华新华字典数据库和 API](https://github.com/pwxcoo/chinese-xinhua)
+  * [THUOCL：清华大学开放中文词库](http://thuocl.thunlp.org/)
+
