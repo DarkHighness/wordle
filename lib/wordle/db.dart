@@ -1,34 +1,52 @@
 import 'dart:math';
 
+import 'package:wordle/util.dart';
+
 import 'model.dart';
 
 class IdiomDb {
   late List<String> idiomHashes;
   late Map<String, Idiom> idiomMap;
-  late Map<String, List<String>> idiomChMap;
+  late Map<String, Set<String>> idiomChMap;
   late Set<String> idiomSet;
+
+  late Set<String> poemSet;
+  late Map<String, Set<String>> poemChMap;
 
   IdiomDb(List<Idiom> idiomList) {
     idiomMap = {};
     idiomChMap = {};
     idiomSet = {};
     idiomHashes = [];
+    poemSet = {};
+    poemChMap = {};
 
     for (var idiom in idiomList) {
       idiomHashes.add(idiom.hash);
       idiomMap[idiom.hash] = idiom;
-      idiomSet.add(idiom.word);
 
-      for (var ch in idiom.word.split("")) {
-        idiomChMap.putIfAbsent(ch, () => []);
+      if (idiom.type == "idiom") {
+        idiomSet.add(idiom.word);
 
-        idiomChMap[ch]!.add(idiom.hash);
+        for (var ch in idiom.word.split("")) {
+          idiomChMap.putIfAbsent(ch, () => {});
+
+          idiomChMap[ch]!.add(idiom.hash);
+        }
+      } else {
+        poemSet.add(idiom.word);
+
+        for (var ch in idiom.word.split("")) {
+          poemChMap.putIfAbsent(ch, () => {});
+
+          poemChMap[ch]!.add(idiom.hash);
+        }
       }
     }
   }
 
   bool isValid(String word) {
-    return idiomSet.contains(word);
+    return idiomSet.contains(word) || poemSet.contains(word);
   }
 
   Problem pickProblem(String hash) {
@@ -53,7 +71,11 @@ class IdiomDb {
     List<String> pool = [];
 
     for (var ch in idiom.word.split('')) {
-      pool.addAll(idiomChMap[ch]!);
+      if (idiom.type == "idiom") {
+        pool.addAll(idiomChMap[ch]!);
+      } else {
+        pool.addAll(poemChMap[ch]!);
+      }
     }
 
     pool.shuffle(seedRand);
@@ -63,8 +85,8 @@ class IdiomDb {
     var chs = idiom.word.split('');
     var pinyin = idiom.pinyin.split(' ');
 
-    for (var i = 0; i < 4; i++) {
-      potentialItems.add(Character(chs[i], pinyin[i]));
+    for (var i = 0; i < chs.length; i++) {
+      potentialItems.add(Character(chs[i], getOrDefault(pinyin, i, " ")));
     }
 
     var poolIdx = 0;
@@ -76,8 +98,8 @@ class IdiomDb {
       var chs = idiom.word.split('');
       var pinyin = idiom.pinyin.split(' ');
 
-      for (var i = 0; i < 4; i++) {
-        potentialItems.add(Character(chs[i], pinyin[i]));
+      for (var i = 0; i < chs.length; i++) {
+        potentialItems.add(Character(chs[i], getOrDefault(pinyin, i, " ")));
       }
 
       poolIdx += 1;

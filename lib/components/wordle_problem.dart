@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:wordle/components/wordle_guess.dart';
 import 'package:wordle/components/wordle_input.dart';
 import 'package:wordle/constants/audios.dart';
+import 'package:wordle/util.dart';
 import 'package:wordle/wordle/db.dart';
 import 'package:wordle/wordle/model.dart';
 
@@ -57,19 +58,20 @@ class _WordleProblemState extends State<WordleProblem> {
 
   void init() {
     inputItems = widget.problem.potentialItems.map((e) => Item(e)).toList();
-    guessItems = List.generate(24, (i) => Item.empty());
+    guessItems = List.generate(
+        6 * widget.problem.idiom.word.length, (i) => Item.empty());
     answer = [];
     answerWords = {};
 
     var chs = widget.problem.idiom.word.split('');
     var pinyin = widget.problem.idiom.pinyin.split(' ');
 
-    for (var i = 0; i < 4; i++) {
-      answer.add(Character(chs[i], pinyin[i]));
+    for (var i = 0; i < chs.length; i++) {
+      answer.add(Character(chs[i], getOrDefault(pinyin, i, " ")));
       answerWords.add(chs[i]);
     }
 
-    length = 4;
+    length = answer.length;
     idx = 0;
     tries = 0;
   }

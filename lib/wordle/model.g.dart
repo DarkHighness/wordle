@@ -12,6 +12,7 @@ Idiom _$IdiomFromJson(Map<String, dynamic> json) => Idiom(
       json['pinyin'] as String,
       json['explanation'] as String,
       json['derivation'] as String,
+      json['type'] as String,
     );
 
 Map<String, dynamic> _$IdiomToJson(Idiom instance) => <String, dynamic>{
@@ -20,6 +21,7 @@ Map<String, dynamic> _$IdiomToJson(Idiom instance) => <String, dynamic>{
       'pinyin': instance.pinyin,
       'explanation': instance.explanation,
       'derivation': instance.derivation,
+      'type': instance.type,
     };
 
 IdiomLog _$IdiomLogFromJson(Map<String, dynamic> json) => IdiomLog(

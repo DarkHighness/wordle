@@ -9,8 +9,10 @@ class Idiom {
   final String pinyin;
   final String explanation;
   final String derivation;
+  final String type;
 
-  Idiom(this.hash, this.word, this.pinyin, this.explanation, this.derivation);
+  Idiom(this.hash, this.word, this.pinyin, this.explanation, this.derivation,
+      this.type);
 
   factory Idiom.fromJson(Map<String, dynamic> json) => _$IdiomFromJson(json);
 

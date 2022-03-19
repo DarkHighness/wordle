@@ -1,7 +1,9 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:wordle/components/wordle_letter.dart';
 import 'package:wordle/components/wordle_problem.dart';
+import 'package:wordle/wordle/model.dart';
 
 class WordleGuess extends StatefulWidget {
   final List<Item> guess;
@@ -172,8 +174,8 @@ class _WordleGuessState extends State<WordleGuess>
 
   @override
   Widget build(BuildContext context) {
-    assert(widget.guess.length ~/ widget.length == 6 &&
-        widget.guess.length % widget.length == 0);
+    // assert(widget.guess.length ~/ widget.length == 6 &&
+    //     widget.guess.length % widget.length == 0);
 
     scaleControllers[widget.idx].reset();
     scaleControllers[widget.idx].forward();
@@ -194,10 +196,12 @@ class _WordleGuessState extends State<WordleGuess>
               child: AnimatedBuilder(
                 animation: flipAnimations[i],
                 child: Container(
-                  width:
-                      (MediaQuery.of(context).size.width - 32) / widget.length,
-                  height:
-                      (MediaQuery.of(context).size.width - 32) / widget.length,
+                  width: (MediaQuery.of(context).size.width -
+                          (widget.length) * 8) /
+                      widget.length,
+                  height: (MediaQuery.of(context).size.width -
+                          (widget.length) * 8) /
+                      widget.length,
                   decoration: BoxDecoration(
                     color: backgroundColorOfStatus(e.status),
                     border: Border.all(
@@ -209,25 +213,16 @@ class _WordleGuessState extends State<WordleGuess>
                   child: e.character != null
                       ? ScaleTransition(
                           scale: scaleAnimations[i],
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Text(
-                                e.character!.pinyin,
-                                style: textStyleOfStatus(e.status),
-                              ),
-                              SizedBox.fromSize(
-                                size: const Size.fromHeight(4),
-                              ),
-                              Text(
-                                e.character!.word,
-                                style: textStyleOfStatus(e.status),
-                              )
-                            ],
+                          child: WordleLetter(
+                            character: e.character!,
+                            pinyinStyle: textStyleOfStatus(e.status),
+                            wordStyle: textStyleOfStatus(e.status),
                           ),
                         )
-                      : Container(),
+                      : WordleLetter(
+                          character: Character("", ""),
+                          pinyinStyle: textStyleOfStatus(e.status),
+                          wordStyle: textStyleOfStatus(e.status)),
                 ),
                 builder: (context, child) {
                   var matrix4 = Matrix4.identity();
@@ -253,9 +248,7 @@ class _WordleGuessState extends State<WordleGuess>
           ),
           builder: (context, child) {
             return Transform.translate(
-              // 4. apply a translation as a function of the animation value
               offset: Offset(shakeAnimations[index].value * shakeOffset, 0),
-              // 5. use the child widget
               child: child,
             );
           },

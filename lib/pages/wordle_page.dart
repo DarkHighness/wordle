@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:wordle/components/wordle_problem.dart';
 import 'package:wordle/constants/audios.dart';
+import 'package:wordle/util.dart';
 import 'package:wordle/wordle/db.dart';
 import 'package:wordle/wordle/model.dart';
 import 'package:wordle/wordle/util.dart';
@@ -42,8 +43,8 @@ class _WordlePageState extends State<WordlePage> {
     var chs = problem!.idiom.word.split('');
     var pinyin = problem!.idiom.pinyin.split(' ');
 
-    for (var i = 0; i < 4; i++) {
-      answer!.add(Character(chs[i], pinyin[i]));
+    for (var i = 0; i < chs.length; i++) {
+      answer!.add(Character(chs[i], getOrDefault(pinyin, i, " ")));
     }
   }
 
@@ -262,6 +263,10 @@ class _WordlePageState extends State<WordlePage> {
                 callback: (bool right) {
                   answerDialog(right);
                 },
+              );
+            } else if (snapshot.hasError) {
+              return Center(
+                child: Text(snapshot.error.toString()),
               );
             } else {
               return const Center(
