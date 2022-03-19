@@ -6,15 +6,18 @@ class IdiomDb {
   late List<String> idiomHashes;
   late Map<String, Idiom> idiomMap;
   late Map<String, List<String>> idiomChMap;
+  late Set<String> idiomSet;
 
   IdiomDb(List<Idiom> idiomList) {
     idiomMap = {};
     idiomChMap = {};
+    idiomSet = {};
     idiomHashes = [];
 
     for (var idiom in idiomList) {
       idiomHashes.add(idiom.hash);
       idiomMap[idiom.hash] = idiom;
+      idiomSet.add(idiom.word);
 
       for (var ch in idiom.word.split("")) {
         idiomChMap.putIfAbsent(ch, () => []);
@@ -24,14 +27,26 @@ class IdiomDb {
     }
   }
 
-  Problem randomProblem() {
+  bool isValid(String word) {
+    return idiomSet.contains(word);
+  }
+
+  Problem pickProblem(String hash) {
+    return composeProblem(hash, null);
+  }
+
+  Problem randomProblem(int? seed) {
     var rand = Random();
     var idx = rand.nextInt(idiomHashes.length);
 
     var hash = idiomHashes[idx];
+    return composeProblem(hash, seed);
+  }
+
+  Problem composeProblem(String hash, int? seed) {
     var idiom = idiomMap[hash]!;
 
-    var seed = hash.codeUnits.reduce((v, e) => v * e).toInt();
+    seed ??= hash.codeUnits.reduce((v, e) => v * e).toInt();
 
     var seedRand = Random(seed);
 

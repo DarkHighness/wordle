@@ -25,14 +25,14 @@ class WordleInput extends StatelessWidget {
     switch (status) {
       case ItemStatus.invalid:
         return TextStyle(
-          fontSize: word ? 16 : 12,
+          fontSize: word ? 16 : 10,
           color: Colors.black,
         );
       case ItemStatus.missing:
       case ItemStatus.exists:
       case ItemStatus.ok:
         return TextStyle(
-          fontSize: word ? 16 : 12,
+          fontSize: word ? 16 : 10,
           color: Colors.white,
         );
     }
@@ -52,6 +52,7 @@ class WordleInput extends StatelessWidget {
                 style: ButtonStyle(
                   backgroundColor: MaterialStateProperty.all(
                       backgroundColorOfStatus(e.status)),
+                  padding: MaterialStateProperty.all(EdgeInsets.zero),
                 ),
                 onPressed: () {
                   onTap(e);

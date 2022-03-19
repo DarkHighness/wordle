@@ -37,11 +37,23 @@ class Character {
 
 class Problem {
   final Idiom idiom;
+
   // 储存备选字
   // Tips: 由于生成的时候, 备选字重新组合后可能出现原本不在原始范围内的词语, 因此, 直接去db中检索
   final List<Character> potentialItems;
 
   Problem(this.idiom, this.potentialItems);
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Problem &&
+          runtimeType == other.runtimeType &&
+          idiom == other.idiom &&
+          potentialItems == other.potentialItems;
+
+  @override
+  int get hashCode => idiom.hashCode ^ potentialItems.hashCode;
 }
 
 @JsonSerializable()
