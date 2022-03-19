@@ -5,27 +5,32 @@ import 'package:wordle/util.dart';
 import 'model.dart';
 
 class IdiomDb {
-  late List<String> idiomHashes;
   late Map<String, Idiom> idiomMap;
+
+  late List<String> idiomHashes;
   late Map<String, Set<String>> idiomChMap;
   late Set<String> idiomSet;
 
   late Set<String> poemSet;
   late Map<String, Set<String>> poemChMap;
+  late List<String> poemHashes;
 
   IdiomDb(List<Idiom> idiomList) {
     idiomMap = {};
+
     idiomChMap = {};
     idiomSet = {};
     idiomHashes = [];
+
     poemSet = {};
     poemChMap = {};
+    poemHashes = [];
 
     for (var idiom in idiomList) {
-      idiomHashes.add(idiom.hash);
       idiomMap[idiom.hash] = idiom;
 
       if (idiom.type == "idiom") {
+        idiomHashes.add(idiom.hash);
         idiomSet.add(idiom.word);
 
         for (var ch in idiom.word.split("")) {
@@ -34,6 +39,7 @@ class IdiomDb {
           idiomChMap[ch]!.add(idiom.hash);
         }
       } else {
+        poemHashes.add(idiom.hash);
         poemSet.add(idiom.word);
 
         for (var ch in idiom.word.split("")) {
@@ -53,11 +59,22 @@ class IdiomDb {
     return composeProblem(hash, null);
   }
 
-  Problem randomProblem(int? seed) {
+  Problem randomProblem(String type, int? seed) {
     var rand = Random();
-    var idx = rand.nextInt(idiomHashes.length);
+    var hash;
 
-    var hash = idiomHashes[idx];
+    assert(type == "idiom" || type == "poem");
+
+    if (type == "idiom") {
+      var idx = rand.nextInt(idiomHashes.length);
+
+      hash = idiomHashes[idx];
+    } else {
+      var idx = rand.nextInt(poemHashes.length);
+
+      hash = poemHashes[idx];
+    }
+
     return composeProblem(hash, seed);
   }
 

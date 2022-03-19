@@ -19,9 +19,9 @@ class _WordlePageState extends State<WordlePage> {
   Problem? problem;
   List<Character>? answer;
 
-  Future<Problem> randomProblem(int? seed) async {
+  Future<Problem> randomProblem(String type, int? seed) async {
     db ??= await readAssetsIdiom();
-    problem = db!.randomProblem(seed);
+    problem = db!.randomProblem(type, seed);
 
     setupAnswer();
 
@@ -52,7 +52,7 @@ class _WordlePageState extends State<WordlePage> {
 
   @override
   void initState() {
-    _problemFuture = randomProblem(null);
+    _problemFuture = randomProblem("idiom", null);
 
     super.initState();
   }
@@ -215,7 +215,7 @@ class _WordlePageState extends State<WordlePage> {
                     var date = DateTime.now();
                     var seed = date.year * 100000 + date.month * 100 + date.day;
 
-                    randomProblem(seed).then((value) => setState(() {
+                    randomProblem("idiom", seed).then((value) => setState(() {
                           // Just for update
                           problem = value;
                         }));
@@ -227,14 +227,26 @@ class _WordlePageState extends State<WordlePage> {
                   onPressed: () {
                     internalAudioPlayer.play("keypress-standard.mp3");
 
-                    randomProblem(null).then((value) => setState(() {
+                    randomProblem("idiom", null).then((value) => setState(() {
                           // Just for update
                           problem = value;
                         }));
 
                     Navigator.of(context).pop();
                   },
-                  child: const Text("随机")),
+                  child: const Text("随机成语")),
+              OutlinedButton(
+                  onPressed: () {
+                    internalAudioPlayer.play("keypress-standard.mp3");
+
+                    randomProblem("poem", null).then((value) => setState(() {
+                          // Just for update
+                          problem = value;
+                        }));
+
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text("随机诗词")),
               OutlinedButton(
                   onPressed: () {
                     internalAudioPlayer.play("keypress-standard.mp3");
@@ -243,7 +255,7 @@ class _WordlePageState extends State<WordlePage> {
 
                     seedInputDialog();
                   },
-                  child: const Text("选择")),
+                  child: const Text("题目ID")),
             ],
           );
         });

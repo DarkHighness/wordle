@@ -46,6 +46,12 @@ class _WordleGuessState extends State<WordleGuess>
 
   @override
   void initState() {
+    initAnimations();
+
+    super.initState();
+  }
+
+  void initAnimations() {
     shakeControllers = List.generate(
         widget.guess.length ~/ widget.length,
         (_) => AnimationController(
@@ -110,8 +116,6 @@ class _WordleGuessState extends State<WordleGuess>
         return animation;
       },
     );
-
-    super.initState();
   }
 
   @override
@@ -257,5 +261,14 @@ class _WordleGuessState extends State<WordleGuess>
       },
       itemCount: widget.guess.length ~/ widget.length,
     );
+  }
+
+  @override
+  void didUpdateWidget(covariant WordleGuess oldWidget) {
+    if (widget.guess != oldWidget.guess || widget.length != oldWidget.length) {
+      initAnimations();
+    }
+
+    super.didUpdateWidget(oldWidget);
   }
 }
