@@ -1,16 +1,14 @@
-# 用以从新华字典的成语 JSON 中生成成语表及映射关系表
+# 用以从新华字典的成语 JSON 中生成成语表
 
 import ujson
 import hashlib
 
 words = []
-ch_2_words = {}
 hash_set = set()
 
-with open("./assets/idiom.json", "r", encoding="utf-8") as f, \
-        open("./assets/words.json", "w", encoding="utf-8") as wf, \
-        open("./assets/map.json", "w", encoding="utf-8") as mf:
-    doc = ujson.load(f)
+with open("./assets/idiom.json", "r", encoding="utf-8") as ifp, \
+        open("./assets/idioms.json", "w", encoding="utf-8") as ofp:
+    doc = ujson.load(ifp)
 
     for idiom in doc:
         word = idiom["word"]
@@ -33,11 +31,4 @@ with open("./assets/idiom.json", "r", encoding="utf-8") as f, \
             "derivation": idiom["derivation"]
         })
 
-        for ch in word:
-            if ch not in ch_2_words:
-                ch_2_words[ch] = []
-
-            ch_2_words[ch].append(word)
-
-    ujson.dump(words, wf, ensure_ascii=False)
-    ujson.dump(ch_2_words, mf, ensure_ascii=False, sort_keys=True)
+    ujson.dump(words, ofp, ensure_ascii=False)
