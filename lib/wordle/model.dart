@@ -59,37 +59,12 @@ class Problem {
 }
 
 @JsonSerializable()
-class IdiomLog {
-  final List<String> log;
-
-  IdiomLog(this.log) {
-    assert(log.length == 4);
-  }
-
-  factory IdiomLog.fromJson(Map<String, dynamic> json) =>
-      _$IdiomLogFromJson(json);
-
-  Map<String, dynamic> toJson() => _$IdiomLogToJson(this);
-}
-
-@JsonSerializable()
-class IdiomStatus {
-  final String hash;
-  late List<IdiomLog> logs;
-
-  IdiomStatus(this.hash, this.logs);
-
-  factory IdiomStatus.fromJson(Map<String, dynamic> json) =>
-      _$IdiomStatusFromJson(json);
-
-  Map<String, dynamic> toJson() => _$IdiomStatusToJson(this);
-}
-
-@JsonSerializable()
 class UserData {
-  late List<IdiomStatus> status;
+  late List<String> solved;
+  late int totalTries;
+  late bool hardMode;
 
-  UserData(this.status);
+  UserData(this.solved, this.totalTries, this.hardMode);
 
   factory UserData.fromJson(Map<String, dynamic> json) =>
       _$UserDataFromJson(json);

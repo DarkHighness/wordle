@@ -24,33 +24,14 @@ Map<String, dynamic> _$IdiomToJson(Idiom instance) => <String, dynamic>{
       'type': instance.type,
     };
 
-IdiomLog _$IdiomLogFromJson(Map<String, dynamic> json) => IdiomLog(
-      (json['log'] as List<dynamic>).map((e) => e as String).toList(),
-    );
-
-Map<String, dynamic> _$IdiomLogToJson(IdiomLog instance) => <String, dynamic>{
-      'log': instance.log,
-    };
-
-IdiomStatus _$IdiomStatusFromJson(Map<String, dynamic> json) => IdiomStatus(
-      json['hash'] as String,
-      (json['logs'] as List<dynamic>)
-          .map((e) => IdiomLog.fromJson(e as Map<String, dynamic>))
-          .toList(),
-    );
-
-Map<String, dynamic> _$IdiomStatusToJson(IdiomStatus instance) =>
-    <String, dynamic>{
-      'hash': instance.hash,
-      'logs': instance.logs,
-    };
-
 UserData _$UserDataFromJson(Map<String, dynamic> json) => UserData(
-      (json['status'] as List<dynamic>)
-          .map((e) => IdiomStatus.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      (json['solved'] as List<dynamic>).map((e) => e as String).toList(),
+      json['totalTries'] as int,
+      json['hardMode'] as bool,
     );
 
 Map<String, dynamic> _$UserDataToJson(UserData instance) => <String, dynamic>{
-      'status': instance.status,
+      'solved': instance.solved,
+      'totalTries': instance.totalTries,
+      'hardMode': instance.hardMode,
     };

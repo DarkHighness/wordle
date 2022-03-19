@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:wordle/util.dart';
+import 'package:wordle/wordle/config.dart';
 
 import 'model.dart';
 
@@ -55,7 +56,11 @@ class IdiomDb {
     return idiomSet.contains(word);
   }
 
-  Problem pickProblem(String hash) {
+  Problem? pickProblem(String hash) {
+    if (!idiomMap.containsKey(hash)) {
+      return null;
+    }
+
     return composeProblem(hash, null);
   }
 
@@ -85,17 +90,43 @@ class IdiomDb {
 
     var seedRand = Random(seed);
 
-    List<String> pool = [];
+    Set<String> pool = {};
+    Set<int> usedIndex = {};
 
-    for (var ch in idiom.word.split('')) {
-      if (idiom.type == "idiom") {
-        pool.addAll(idiomChMap[ch]!);
-      } else {
-        pool.addAll(poemChMap[ch]!);
+    pool.add(idiom.hash);
+
+    var tries = 0;
+
+    while (pool.length < minRandomPoolSize && tries < maxRandomPoolRetries) {
+      if (usedIndex.length >= pool.length) {
+        break;
       }
+
+      var idx = 0;
+
+      do {
+        idx = seedRand.nextInt(pool.length);
+      } while (usedIndex.contains(idx));
+
+      usedIndex.add(idx);
+
+      var hash = pool.elementAt(idx);
+      var idiom = idiomMap[hash];
+
+      for (var ch in idiom!.word.split('')) {
+        if (idiom.type == "idiom") {
+          pool.addAll(idiomChMap[ch]!);
+        } else {
+          pool.addAll(poemChMap[ch]!);
+        }
+      }
+
+      tries++;
     }
 
-    pool.shuffle(seedRand);
+    var poolList = pool.toList();
+
+    poolList.shuffle(seedRand);
 
     Set<Character> potentialItems = {};
 
@@ -108,8 +139,8 @@ class IdiomDb {
 
     var poolIdx = 0;
 
-    while (poolIdx < 6 && poolIdx < pool.length) {
-      var hash = pool[poolIdx];
+    while (poolIdx < confusionPoolSize && poolIdx < poolList.length) {
+      var hash = poolList[poolIdx];
       var idiom = idiomMap[hash]!;
 
       var chs = idiom.word.split('');

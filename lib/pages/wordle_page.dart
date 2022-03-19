@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:wordle/components/wordle_letter.dart';
 import 'package:wordle/components/wordle_problem.dart';
 import 'package:wordle/constants/audios.dart';
 import 'package:wordle/util.dart';
@@ -20,7 +21,7 @@ class _WordlePageState extends State<WordlePage> {
   List<Character>? answer;
 
   Future<Problem> randomProblem(String type, int? seed) async {
-    db ??= await readAssetsIdiom();
+    db ??= await setupIdiomDb();
     problem = db!.randomProblem(type, seed);
 
     setupAnswer();
@@ -29,8 +30,18 @@ class _WordlePageState extends State<WordlePage> {
   }
 
   Future<Problem> pickProblem(String hash) async {
-    db ??= await readAssetsIdiom();
-    problem = db!.pickProblem(hash);
+    db ??= await setupIdiomDb();
+
+    var _problem = db!.pickProblem(hash);
+
+    if (_problem == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("题目 $hash 不存在"),
+          duration: const Duration(seconds: 1),
+        ),
+      );
+    }
 
     setupAnswer();
 
@@ -52,6 +63,12 @@ class _WordlePageState extends State<WordlePage> {
 
   @override
   void initState() {
+    internalAudioPlayer.loadAll([
+      "keypress-standard.mp3",
+      "keypress-delete.mp3",
+      "keypress-return.mp3"
+    ]);
+
     _problemFuture = randomProblem("idiom", null);
 
     super.initState();
@@ -108,7 +125,16 @@ class _WordlePageState extends State<WordlePage> {
         });
   }
 
-  Future<void> answerDialog(bool right) async {
+  Future<void> settingsDialog() async {
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog();
+      },
+    );
+  }
+
+  Future<void> dictionaryDialog(bool right) async {
     await showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -127,27 +153,16 @@ class _WordlePageState extends State<WordlePage> {
                   ),
                   Row(
                     children: answer!
-                        .map((e) => Padding(
-                              padding: const EdgeInsets.only(right: 8.0),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    e.pinyin,
-                                    style: const TextStyle(
-                                      fontSize: 16,
-                                    ),
-                                  ),
-                                  Text(
-                                    e.word,
-                                    style: const TextStyle(
-                                      fontSize: 22,
-                                    ),
-                                  )
-                                ],
-                              ),
-                            ))
+                        .map(
+                          (e) => Padding(
+                            padding: const EdgeInsets.only(right: 8.0),
+                            child: WordleLetter(
+                              character: e,
+                              pinyinStyle: const TextStyle(fontSize: 16),
+                              wordStyle: const TextStyle(fontSize: 22),
+                            ),
+                          ),
+                        )
                         .toList(),
                   ),
                   Padding(
@@ -273,7 +288,7 @@ class _WordlePageState extends State<WordlePage> {
                 db: db!,
                 problem: problem!,
                 callback: (bool right) {
-                  answerDialog(right);
+                  dictionaryDialog(right);
                 },
               );
             } else if (snapshot.hasError) {
