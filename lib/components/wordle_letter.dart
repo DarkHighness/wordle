@@ -17,7 +17,7 @@ class WordleLetter extends StatelessWidget {
   Widget build(BuildContext context) {
     var children;
 
-    if (character.pinyin != "") {
+    if (character.pinyin.trim() != "") {
       children = [
         Text(
           character.pinyin,

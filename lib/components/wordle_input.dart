@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:wordle/components/wordle_letter.dart';
 import 'package:wordle/components/wordle_problem.dart';
 import 'package:wordle/constants/audios.dart';
 
@@ -60,18 +61,10 @@ class WordleInput extends StatelessWidget {
 
                   onTap(e);
                 },
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      e.character!.pinyin,
-                      style: textStyleForStatus(false, e.status),
-                    ),
-                    Text(
-                      e.character!.word,
-                      style: textStyleForStatus(true, e.status),
-                    )
-                  ],
+                child: WordleLetter(
+                  character: e.character!,
+                  pinyinStyle: textStyleForStatus(false, e.status),
+                  wordStyle: textStyleForStatus(true, e.status),
                 ),
               ),
             )

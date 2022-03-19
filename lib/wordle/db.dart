@@ -46,7 +46,7 @@ class IdiomDb {
   }
 
   bool isValid(String word) {
-    return idiomSet.contains(word) || poemSet.contains(word);
+    return idiomSet.contains(word);
   }
 
   Problem pickProblem(String hash) {

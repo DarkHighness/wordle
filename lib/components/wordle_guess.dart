@@ -142,6 +142,7 @@ class _WordleGuessState extends State<WordleGuess>
 
   Future<void> flip(int row) async {
     for (var i = row * widget.length; i < (row + 1) * widget.length; i++) {
+      flipControllers[i].reset();
       flipControllers[i].forward();
 
       await Future.delayed(const Duration(milliseconds: 100));

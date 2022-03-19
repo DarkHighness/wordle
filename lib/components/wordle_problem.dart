@@ -101,7 +101,7 @@ class _WordleProblemState extends State<WordleProblem> {
         word += guessItems[i].character!.word;
       }
 
-      if (!widget.db.isValid(word)) {
+      if (widget.problem.idiom.type == "idiom" && !widget.db.isValid(word)) {
         (guessKey.currentState as dynamic).shake(tries);
 
         return;
@@ -112,7 +112,8 @@ class _WordleProblemState extends State<WordleProblem> {
           guessItems[i].status = ItemStatus.ok;
 
           for (var item in inputItems) {
-            if (item.character == guessItems[i].character) {
+            if (item.status == ItemStatus.invalid &&
+                item.character == guessItems[i].character) {
               item.status = ItemStatus.ok;
               break;
             }
@@ -135,7 +136,8 @@ class _WordleProblemState extends State<WordleProblem> {
           guessItems[i].status = ItemStatus.exists;
 
           for (var item in inputItems) {
-            if (item.character == guessItems[i].character) {
+            if (item.status == ItemStatus.invalid &&
+                item.character == guessItems[i].character) {
               item.status = ItemStatus.exists;
               break;
             }
@@ -147,7 +149,8 @@ class _WordleProblemState extends State<WordleProblem> {
         guessItems[i].status = ItemStatus.missing;
 
         for (var item in inputItems) {
-          if (item.character == guessItems[i].character) {
+          if (item.status == ItemStatus.invalid &&
+              item.character == guessItems[i].character) {
             item.status = ItemStatus.missing;
             break;
           }
