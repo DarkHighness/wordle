@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:wordle/components/wordle_problem.dart';
+import 'package:wordle/constants/audios.dart';
 import 'package:wordle/wordle/db.dart';
 import 'package:wordle/wordle/model.dart';
 import 'package:wordle/wordle/util.dart';
@@ -85,6 +86,8 @@ class _WordlePageState extends State<WordlePage> {
             actions: [
               OutlinedButton(
                 onPressed: () {
+                  internalAudioPlayer.play("keypress-standard.mp3");
+
                   pickProblem(hashValue);
 
                   Navigator.pop(context);
@@ -93,6 +96,8 @@ class _WordlePageState extends State<WordlePage> {
               ),
               OutlinedButton(
                 onPressed: () {
+                  internalAudioPlayer.play("keypress-delete.mp3");
+
                   Navigator.pop(context);
                 },
                 child: const Text("取消"),
@@ -204,6 +209,8 @@ class _WordlePageState extends State<WordlePage> {
             actions: [
               OutlinedButton(
                   onPressed: () {
+                    internalAudioPlayer.play("keypress-standard.mp3");
+
                     var date = DateTime.now();
                     var seed = date.year * 100000 + date.month * 100 + date.day;
 
@@ -217,6 +224,8 @@ class _WordlePageState extends State<WordlePage> {
                   child: const Text("每日题目")),
               OutlinedButton(
                   onPressed: () {
+                    internalAudioPlayer.play("keypress-standard.mp3");
+
                     randomProblem(null).then((value) => setState(() {
                           // Just for update
                           problem = value;
@@ -227,6 +236,8 @@ class _WordlePageState extends State<WordlePage> {
                   child: const Text("随机")),
               OutlinedButton(
                   onPressed: () {
+                    internalAudioPlayer.play("keypress-standard.mp3");
+
                     Navigator.of(context).pop();
 
                     seedInputDialog();

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:wordle/components/wordle_guess.dart';
 import 'package:wordle/components/wordle_input.dart';
+import 'package:wordle/constants/audios.dart';
 import 'package:wordle/wordle/db.dart';
 import 'package:wordle/wordle/model.dart';
 
@@ -41,9 +42,14 @@ class _WordleProblemState extends State<WordleProblem> {
   late int idx;
   late int length;
   late int tries;
+  late GlobalKey guessKey;
+  late GlobalKey inputKey;
 
   @override
   void initState() {
+    guessKey = GlobalKey();
+    inputKey = GlobalKey();
+
     init();
 
     super.initState();
@@ -94,6 +100,8 @@ class _WordleProblemState extends State<WordleProblem> {
       }
 
       if (!widget.db.isValid(word)) {
+        (guessKey.currentState as dynamic).shake(tries);
+
         return;
       }
 
@@ -111,6 +119,8 @@ class _WordleProblemState extends State<WordleProblem> {
           right++;
 
           if (right == length) {
+            (guessKey.currentState as dynamic).flip(tries);
+
             widget.callback(true);
 
             return;
@@ -142,6 +152,8 @@ class _WordleProblemState extends State<WordleProblem> {
         }
       }
 
+      (guessKey.currentState as dynamic).flip(tries);
+
       tries++;
 
       if (tries >= 6) {
@@ -160,11 +172,13 @@ class _WordleProblemState extends State<WordleProblem> {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            WordleGuess(guess: guessItems, length: length),
+            WordleGuess(
+                key: guessKey, guess: guessItems, idx: idx, length: length),
             SizedBox.fromSize(
               size: const Size.fromHeight(8),
             ),
             WordleInput(
+              key: inputKey,
               items: inputItems,
               onTap: (Item item) {
                 setState(() {
@@ -186,18 +200,24 @@ class _WordleProblemState extends State<WordleProblem> {
                 children: [
                   OutlinedButton(
                     onPressed: () {
+                      internalAudioPlayer.play("keypress-standard.mp3");
+
                       checkGuess();
                     },
                     child: const Text("确认"),
                   ),
                   OutlinedButton(
                     onPressed: () {
+                      internalAudioPlayer.play("keypress-delete.mp3");
+
                       widget.callback(false);
                     },
                     child: const Text("放弃"),
                   ),
                   OutlinedButton(
                     onPressed: () {
+                      internalAudioPlayer.play("keypress-delete.mp3");
+
                       removeGuess();
                     },
                     child: const Text("删除"),

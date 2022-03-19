@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:wordle/components/wordle_problem.dart';
+import 'package:wordle/constants/audios.dart';
 
 class WordleInput extends StatelessWidget {
   final List<Item> items;
@@ -55,6 +56,8 @@ class WordleInput extends StatelessWidget {
                   padding: MaterialStateProperty.all(EdgeInsets.zero),
                 ),
                 onPressed: () {
+                  internalAudioPlayer.play("keypress-standard.mp3");
+
                   onTap(e);
                 },
                 child: Column(
