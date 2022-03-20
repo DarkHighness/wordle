@@ -33,6 +33,7 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
+  provider: ^6.0.2
   path_provider: ^2.0.9
   tuple: ^2.0.0
   json_annotation: ^4.4.0
@@ -64,7 +65,7 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-    - assets/idioms.json
+    - assets/problems.json
     - assets/audios/keypress-standard.mp3
     - assets/audios/keypress-return.mp3
     - assets/audios/keypress-delete.mp3
