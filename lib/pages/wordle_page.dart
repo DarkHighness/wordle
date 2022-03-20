@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:wordle/components/wordle_letter.dart';
 import 'package:wordle/components/wordle_problem.dart';
 import 'package:wordle/constants/audios.dart';
 import 'package:wordle/util.dart';
@@ -22,11 +21,10 @@ class _WordlePageState extends State<WordlePage> {
 
   Future<Problem> randomProblem(String type, int? seed) async {
     db ??= await setupIdiomDb();
-    problem = db!.randomProblem(type, seed);
 
-    setupAnswer();
+    var _problem = db!.randomProblem(type, seed);
 
-    return problem!;
+    return _problem;
   }
 
   Future<Problem> pickProblem(String hash) async {
@@ -41,25 +39,31 @@ class _WordlePageState extends State<WordlePage> {
           duration: const Duration(seconds: 1),
         ),
       );
+
+      throw Exception("invalid problem hash: $hash");
     }
 
-    setupAnswer();
-
-    return problem!;
+    return _problem;
   }
 
-  void setupAnswer() {
-    answer = [];
+  Future<void> initProblem(Problem newProblem) async {
+    setState(() {
+      problem = newProblem;
 
-    var chs = problem!.idiom.word.split('');
-    var pinyin = problem!.idiom.pinyin.split(' ');
+      List<Character> _answer = [];
 
-    for (var i = 0; i < chs.length; i++) {
-      answer!.add(Character(chs[i], getOrDefault(pinyin, i, " ")));
-    }
+      var chs = newProblem.idiom.word.split('');
+      var pinyin = newProblem.idiom.pinyin.split(' ');
+
+      for (var i = 0; i < chs.length; i++) {
+        _answer.add(Character(chs[i], getOrDefault(pinyin, i, " ")));
+      }
+
+      answer = _answer;
+    });
   }
 
-  late Future<Problem> _problemFuture;
+  late Future<void> _problemFuture;
 
   @override
   void initState() {
@@ -69,7 +73,7 @@ class _WordlePageState extends State<WordlePage> {
       "keypress-return.mp3"
     ]);
 
-    _problemFuture = randomProblem("idiom", null);
+    _problemFuture = randomProblem("idiom", null).then(initProblem);
 
     super.initState();
   }
@@ -103,10 +107,16 @@ class _WordlePageState extends State<WordlePage> {
             ),
             actions: [
               OutlinedButton(
-                onPressed: () {
+                onPressed: () async {
                   internalAudioPlayer.play("keypress-standard.mp3");
 
-                  pickProblem(hashValue);
+                  try {
+                    var problem = await pickProblem(hashValue);
+
+                    initProblem(problem);
+                  } on ArgumentError {
+                    debugPrint("missing problem id $hashValue");
+                  }
 
                   Navigator.pop(context);
                 },
@@ -152,15 +162,20 @@ class _WordlePageState extends State<WordlePage> {
                     ),
                   ),
                   Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: answer!
                         .map(
-                          (e) => Padding(
-                            padding: const EdgeInsets.only(right: 8.0),
-                            child: WordleLetter(
-                              character: e,
-                              pinyinStyle: const TextStyle(fontSize: 16),
-                              wordStyle: const TextStyle(fontSize: 22),
-                            ),
+                          (e) => Column(
+                            children: [
+                              Text(
+                                e.pinyin,
+                                style: const TextStyle(fontSize: 16),
+                              ),
+                              Text(
+                                e.word,
+                                style: const TextStyle(fontSize: 22),
+                              )
+                            ],
                           ),
                         )
                         .toList(),
@@ -230,10 +245,7 @@ class _WordlePageState extends State<WordlePage> {
                     var date = DateTime.now();
                     var seed = date.year * 100000 + date.month * 100 + date.day;
 
-                    randomProblem("idiom", seed).then((value) => setState(() {
-                          // Just for update
-                          problem = value;
-                        }));
+                    randomProblem("idiom", seed).then(initProblem);
 
                     Navigator.of(context).pop();
                   },
@@ -242,10 +254,7 @@ class _WordlePageState extends State<WordlePage> {
                   onPressed: () {
                     internalAudioPlayer.play("keypress-standard.mp3");
 
-                    randomProblem("idiom", null).then((value) => setState(() {
-                          // Just for update
-                          problem = value;
-                        }));
+                    randomProblem("idiom", null).then(initProblem);
 
                     Navigator.of(context).pop();
                   },
@@ -254,10 +263,7 @@ class _WordlePageState extends State<WordlePage> {
                   onPressed: () {
                     internalAudioPlayer.play("keypress-standard.mp3");
 
-                    randomProblem("poem", null).then((value) => setState(() {
-                          // Just for update
-                          problem = value;
-                        }));
+                    randomProblem("poem", null).then(initProblem);
 
                     Navigator.of(context).pop();
                   },
@@ -282,23 +288,22 @@ class _WordlePageState extends State<WordlePage> {
       body: SafeArea(
         child: FutureBuilder(
           future: _problemFuture,
-          builder: (BuildContext context, AsyncSnapshot<Problem> snapshot) {
-            if (snapshot.hasData) {
-              return WordleProblem(
-                db: db!,
-                problem: problem!,
-                callback: (bool right) {
-                  dictionaryDialog(right);
-                },
-              );
-            } else if (snapshot.hasError) {
-              return Center(
-                child: Text(snapshot.error.toString()),
-              );
-            } else {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
+          builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
+            switch (snapshot.connectionState) {
+              case ConnectionState.none:
+              case ConnectionState.waiting:
+              case ConnectionState.active:
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              case ConnectionState.done:
+                return WordleProblem(
+                  db: db!,
+                  problem: problem!,
+                  callback: (bool right) {
+                    dictionaryDialog(right);
+                  },
+                );
             }
           },
         ),

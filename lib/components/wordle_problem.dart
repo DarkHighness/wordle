@@ -172,7 +172,7 @@ class _WordleProblemState extends State<WordleProblem> {
     return SingleChildScrollView(
       child: Container(
         height: MediaQuery.of(context).size.height - 24,
-        padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           crossAxisAlignment: CrossAxisAlignment.center,
