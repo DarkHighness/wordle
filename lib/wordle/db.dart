@@ -2,8 +2,67 @@ import 'dart:math';
 
 import 'package:wordle/util.dart';
 import 'package:wordle/wordle/config.dart';
+import 'package:wordle/wordle/util.dart';
 
 import 'model.dart';
+
+class UserDb {
+  UserData userData;
+
+  Set<String> solvedSet;
+
+  UserDb(this.userData) : solvedSet = {} {
+    solvedSet.addAll(userData.solved);
+  }
+
+  void markSolved(String hash) {
+    if (solvedSet.contains(hash)) {
+      return;
+    }
+
+    solvedSet.add(hash);
+    userData.solved.add(hash);
+
+    save();
+  }
+
+  void markUnsolved(String hash) {
+    if (!solvedSet.contains(hash)) {
+      return;
+    }
+
+    solvedSet.remove(hash);
+    userData.solved.remove(hash);
+
+    save();
+  }
+
+  bool isSolved(String hash) {
+    return solvedSet.contains(hash);
+  }
+
+  int solvedCnt() {
+    return solvedSet.length;
+  }
+
+  void addTriesCnt(int cnt) {
+    userData.totalTries += cnt;
+
+    save();
+  }
+
+  int triesCnt() {
+    return userData.totalTries;
+  }
+
+  Future<void> save() async {
+    await saveUserData(userData);
+  }
+
+  Future<void> load() async {
+    await loadUserData();
+  }
+}
 
 class IdiomDb {
   late Map<String, Idiom> idiomMap;
@@ -50,6 +109,10 @@ class IdiomDb {
         }
       }
     }
+  }
+
+  int problemCnt() {
+    return idiomMap.length;
   }
 
   bool isValid(String word) {

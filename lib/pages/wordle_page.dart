@@ -7,6 +7,8 @@ import 'package:wordle/wordle/db.dart';
 import 'package:wordle/wordle/model.dart';
 import 'package:wordle/wordle/util.dart';
 
+enum ProblemStatus { won, lose, running }
+
 class WordlePage extends StatefulWidget {
   const WordlePage({Key? key}) : super(key: key);
 
@@ -15,22 +17,24 @@ class WordlePage extends StatefulWidget {
 }
 
 class _WordlePageState extends State<WordlePage> {
-  IdiomDb? db;
+  UserDb? userDb;
+  IdiomDb? idiomDb;
   Problem? problem;
   List<Character>? answer;
+  ProblemStatus status = ProblemStatus.running;
 
   Future<Problem> randomProblem(String type, int? seed) async {
-    db ??= await setupIdiomDb();
+    idiomDb ??= await setupIdiomDb();
 
-    var _problem = db!.randomProblem(type, seed);
+    var _problem = idiomDb!.randomProblem(type, seed);
 
     return _problem;
   }
 
   Future<Problem> pickProblem(String hash) async {
-    db ??= await setupIdiomDb();
+    idiomDb ??= await setupIdiomDb();
 
-    var _problem = db!.pickProblem(hash);
+    var _problem = idiomDb!.pickProblem(hash);
 
     if (_problem == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -60,10 +64,19 @@ class _WordlePageState extends State<WordlePage> {
       }
 
       answer = _answer;
+      status = ProblemStatus.running;
     });
   }
 
-  late Future<void> _problemFuture;
+  Future<void> setup() async {
+    var f1 = randomProblem("idiom", null).then(initProblem);
+
+    var f2 = setupUserDb().then((db) => userDb = db);
+
+    await Future.wait([f1, f2]);
+  }
+
+  late Future<void> setupFuture;
 
   @override
   void initState() {
@@ -73,7 +86,7 @@ class _WordlePageState extends State<WordlePage> {
       "keypress-return.mp3"
     ]);
 
-    _problemFuture = randomProblem("idiom", null).then(initProblem);
+    setupFuture = setup();
 
     super.initState();
   }
@@ -139,7 +152,49 @@ class _WordlePageState extends State<WordlePage> {
     await showDialog(
       context: context,
       builder: (BuildContext context) {
-        return Dialog();
+        return AlertDialog(
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text("已解决: "),
+                  Text("${userDb!.solvedCnt()} / ${idiomDb!.problemCnt()}")
+                ],
+              ),
+              SizedBox.fromSize(size: const Size.fromHeight(4.0)),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Flexible(
+                    flex: 9,
+                    child: LinearProgressIndicator(
+                      value: userDb!.solvedCnt() / idiomDb!.problemCnt(),
+                      color: Colors.indigo,
+                    ),
+                  ),
+                  const Spacer(
+                    flex: 1,
+                  ),
+                  Flexible(
+                      flex: 2,
+                      child: Text((userDb!.solvedCnt() / idiomDb!.problemCnt())
+                          .toStringAsFixed(2)))
+                ],
+              ),
+              SizedBox.fromSize(size: const Size.fromHeight(4.0)),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text("尝试次数: "),
+                  Text(
+                      "${userDb!.triesCnt()} (平均: ${userDb!.triesCnt() / userDb!.solvedCnt()})")
+                ],
+              )
+            ],
+          ),
+        );
       },
     );
   }
@@ -277,6 +332,15 @@ class _WordlePageState extends State<WordlePage> {
                     seedInputDialog();
                   },
                   child: const Text("题目ID")),
+              OutlinedButton(
+                  onPressed: () {
+                    internalAudioPlayer.play("keypress-standard.mp3");
+
+                    Navigator.of(context).pop();
+
+                    settingsDialog();
+                  },
+                  child: const Text("设置")),
             ],
           );
         });
@@ -287,7 +351,7 @@ class _WordlePageState extends State<WordlePage> {
     return Scaffold(
       body: SafeArea(
         child: FutureBuilder(
-          future: _problemFuture,
+          future: setupFuture,
           builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
             switch (snapshot.connectionState) {
               case ConnectionState.none:
@@ -298,12 +362,28 @@ class _WordlePageState extends State<WordlePage> {
                 );
               case ConnectionState.done:
                 return WordleProblem(
-                  db: db!,
-                  problem: problem!,
-                  callback: (bool right) {
-                    dictionaryDialog(right);
-                  },
-                );
+                    db: idiomDb!,
+                    problem: problem!,
+                    submitCallback: (ProblemStatus status, int tries) {
+                      if (status == ProblemStatus.won) {
+                        userDb!.markSolved(problem!.idiom.hash);
+                        userDb!.addTriesCnt(tries);
+                        dictionaryDialog(true);
+
+                        setState(() {
+                          status = ProblemStatus.won;
+                        });
+                      } else if (status == ProblemStatus.lose) {
+                        userDb!.addTriesCnt(tries);
+                        dictionaryDialog(false);
+
+                        setState(() {
+                          status = ProblemStatus.lose;
+                        });
+                      } else {
+                        dictionaryDialog(false);
+                      }
+                    });
             }
           },
         ),

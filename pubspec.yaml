@@ -37,6 +37,7 @@ dependencies:
   tuple: ^2.0.0
   json_annotation: ^4.4.0
   audioplayers: ^0.20.1
+  permission_handler: ^9.2.0
 
 dev_dependencies:
   flutter_test:

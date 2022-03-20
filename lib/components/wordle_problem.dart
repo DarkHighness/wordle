@@ -2,20 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:wordle/components/wordle_guess.dart';
 import 'package:wordle/components/wordle_input.dart';
 import 'package:wordle/constants/audios.dart';
+import 'package:wordle/pages/wordle_page.dart';
 import 'package:wordle/util.dart';
+import 'package:wordle/wordle/config.dart';
 import 'package:wordle/wordle/db.dart';
 import 'package:wordle/wordle/model.dart';
 
 class WordleProblem extends StatefulWidget {
   final IdiomDb db;
   final Problem problem;
-  final Function(bool) callback;
+  final Function(ProblemStatus, int) submitCallback;
 
   const WordleProblem(
       {Key? key,
       required this.db,
       required this.problem,
-      required this.callback})
+      required this.submitCallback})
       : super(key: key);
 
   @override
@@ -45,6 +47,7 @@ class _WordleProblemState extends State<WordleProblem> {
   late int tries;
   late GlobalKey guessKey;
   late GlobalKey inputKey;
+  late ProblemStatus status;
 
   @override
   void initState() {
@@ -57,9 +60,11 @@ class _WordleProblemState extends State<WordleProblem> {
   }
 
   void init() {
+    status = ProblemStatus.running;
+
     inputItems = widget.problem.potentialItems.map((e) => Item(e)).toList();
     guessItems = List.generate(
-        6 * widget.problem.idiom.word.length, (i) => Item.empty());
+        maxTries * widget.problem.idiom.word.length, (i) => Item.empty());
     answer = [];
     answerWords = {};
 
@@ -77,6 +82,10 @@ class _WordleProblemState extends State<WordleProblem> {
   }
 
   void removeGuess() {
+    if (status == ProblemStatus.won || status == ProblemStatus.lose) {
+      return;
+    }
+
     if (idx == tries * length) {
       return;
     }
@@ -89,6 +98,10 @@ class _WordleProblemState extends State<WordleProblem> {
   }
 
   void checkGuess() {
+    if (status == ProblemStatus.won || status == ProblemStatus.lose) {
+      return;
+    }
+
     if (idx != (tries + 1) * length) {
       return;
     }
@@ -124,7 +137,9 @@ class _WordleProblemState extends State<WordleProblem> {
           if (right == length) {
             (guessKey.currentState as dynamic).flip(tries);
 
-            widget.callback(true);
+            widget.submitCallback(ProblemStatus.won, tries + 1);
+
+            status = ProblemStatus.won;
 
             return;
           }
@@ -161,8 +176,10 @@ class _WordleProblemState extends State<WordleProblem> {
 
       tries++;
 
-      if (tries >= 6) {
-        widget.callback(false);
+      if (tries >= maxTries) {
+        widget.submitCallback(ProblemStatus.lose, tries + 1);
+
+        status = ProblemStatus.lose;
       }
     });
   }
@@ -213,11 +230,11 @@ class _WordleProblemState extends State<WordleProblem> {
                   ),
                   OutlinedButton(
                     onPressed: () {
-                      internalAudioPlayer.play("keypress-delete.mp3");
+                      internalAudioPlayer.play("keypress-return.mp3");
 
-                      widget.callback(false);
+                      widget.submitCallback(ProblemStatus.running, 0);
                     },
-                    child: const Text("放弃"),
+                    child: const Text("答案"),
                   ),
                   OutlinedButton(
                     onPressed: () {
