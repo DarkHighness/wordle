@@ -30,7 +30,8 @@ with open("./assets/THUOCL_poem.txt", "r", encoding="utf-8") as pfp,\
             "explanation": "无",
             "pinyin": "",
             "derivation": "无",
-            "type": "poem"
+            "type": "poem",
+            "difficulty": "easy"
         })
 
     for idiom in doc:
@@ -39,10 +40,7 @@ with open("./assets/THUOCL_poem.txt", "r", encoding="utf-8") as pfp,\
         if len(word) != 4:
             continue
 
-        if word not in key:
-            continue
-
-        word_hash = hashlib.sha1(word.encode()).hexdigest()[0:8]
+        word_hash = hashlib.sha1(word.encode()).hexdigest()[8:16]
 
         if word_hash in hash_set:
             raise RuntimeError("duplicate hash")
@@ -55,7 +53,8 @@ with open("./assets/THUOCL_poem.txt", "r", encoding="utf-8") as pfp,\
             "explanation": idiom["explanation"],
             "pinyin": idiom["pinyin"],
             "derivation": idiom["derivation"],
-            "type": "idiom"
+            "type": "idiom",
+            "difficulty": "easy" if word in key else "hard"
         })
 
     ujson.dump(words, ofp, ensure_ascii=False)
