@@ -9,7 +9,7 @@ hash_set = set()
 with open("./assets/THUOCL_poem.txt", "r", encoding="utf-8") as pfp,\
         open("./assets/THUOCL_chengyu.txt", "r", encoding="utf-8") as ffp,\
         open("./assets/idiom.json", "r", encoding="utf-8") as ifp, \
-        open("./assets/idioms.json", "w", encoding="utf-8") as ofp:
+        open("./assets/problems.json", "w", encoding="utf-8") as ofp:
     poems = set([key.split()[0].strip() for key in pfp])
 
     key = set([key.split()[0].strip() for key in ffp])
