@@ -1,8 +1,8 @@
 import 'dart:math';
 
-import 'package:wordle/util.dart';
-import 'package:wordle/wordle/config.dart';
-import 'package:wordle/wordle/util.dart';
+import 'package:wordle/v1/util.dart';
+import 'package:wordle/v1/wordle/config.dart';
+import 'package:wordle/v1/wordle/util.dart';
 
 import 'model.dart';
 

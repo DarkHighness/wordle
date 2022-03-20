@@ -1,9 +1,9 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:wordle/components/wordle_letter.dart';
-import 'package:wordle/components/wordle_problem.dart';
-import 'package:wordle/wordle/model.dart';
+import 'package:wordle/v1/components/wordle_letter.dart';
+import 'package:wordle/v1/components/wordle_problem.dart';
+import 'package:wordle/v1/wordle/model.dart';
 
 class WordleGuess extends StatefulWidget {
   final List<Item> guess;

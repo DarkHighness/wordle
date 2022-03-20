@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:wordle/components/wordle_guess.dart';
-import 'package:wordle/components/wordle_input.dart';
-import 'package:wordle/constants/audios.dart';
-import 'package:wordle/pages/wordle_page.dart';
-import 'package:wordle/util.dart';
-import 'package:wordle/wordle/config.dart';
-import 'package:wordle/wordle/db.dart';
-import 'package:wordle/wordle/model.dart';
+import 'package:wordle/v1/components/wordle_guess.dart';
+import 'package:wordle/v1/components/wordle_input.dart';
+import 'package:wordle/v1/constants/audios.dart';
+import 'package:wordle/v1/pages/wordle_page.dart';
+import 'package:wordle/v1/util.dart';
+import 'package:wordle/v1/wordle/config.dart';
+import 'package:wordle/v1/wordle/db.dart';
+import 'package:wordle/v1/wordle/model.dart';
 
 class WordleProblem extends StatefulWidget {
   final IdiomDb db;

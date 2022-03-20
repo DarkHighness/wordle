@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:wordle/components/wordle_letter.dart';
-import 'package:wordle/components/wordle_problem.dart';
-import 'package:wordle/constants/audios.dart';
+import 'package:wordle/v1/components/wordle_letter.dart';
+import 'package:wordle/v1/components/wordle_problem.dart';
+import 'package:wordle/v1/constants/audios.dart';
 
 class WordleInput extends StatelessWidget {
   final List<Item> items;

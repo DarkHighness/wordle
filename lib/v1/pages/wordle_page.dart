@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:wordle/components/wordle_problem.dart';
-import 'package:wordle/constants/audios.dart';
-import 'package:wordle/util.dart';
-import 'package:wordle/wordle/db.dart';
-import 'package:wordle/wordle/model.dart';
-import 'package:wordle/wordle/util.dart';
+import 'package:wordle/v1/components/wordle_problem.dart';
+import 'package:wordle/v1/constants/audios.dart';
+import 'package:wordle/v1/util.dart';
+import 'package:wordle/v1/wordle/db.dart';
+import 'package:wordle/v1/wordle/model.dart';
+import 'package:wordle/v1/wordle/util.dart';
 
 enum ProblemStatus { won, lose, running }
 

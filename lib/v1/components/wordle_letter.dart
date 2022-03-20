@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:wordle/wordle/model.dart';
+import 'package:wordle/v1/wordle/model.dart';
 
 class WordleLetter extends StatelessWidget {
   final Character character;
