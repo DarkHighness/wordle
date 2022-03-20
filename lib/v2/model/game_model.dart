@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:wordle/v2/model/problem_model.dart';
 
 enum InputStatus {
@@ -43,18 +44,25 @@ class InputItem {
 
 enum GameStatus { statusWon, statusLose, statusRunning, statusPausing }
 
-class GameModel {
+class GameModel extends ChangeNotifier {
   ProblemModel problem;
   List<InputItem> inputChoices;
   List<List<InputItem>> guessLogs;
   int maxAttempt;
+  int attempt;
+  int cursor;
   GameStatus gameStatus;
 
   GameModel({
     required this.problem,
     required this.inputChoices,
     required this.maxAttempt,
-  })  : guessLogs = List.generate(maxAttempt,
-            (_) => List.generate(problem.length, (_) => InputItem.empty())),
-        gameStatus = GameStatus.statusRunning;
+  })  : guessLogs = List.generate(
+            maxAttempt,
+            (_) => List.generate(problem.length, (_) => InputItem.empty(),
+                growable: false),
+            growable: false),
+        gameStatus = GameStatus.statusRunning,
+        attempt = 0,
+        cursor = 0;
 }

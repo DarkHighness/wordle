@@ -47,7 +47,7 @@ class GamePageState extends State<GamePage> {
 
     return MultiProvider(
       providers: [
-        Provider.value(value: _gameModel),
+        ChangeNotifierProvider.value(value: _gameModel),
         Provider.value(value: this),
       ],
       child: Scaffold(

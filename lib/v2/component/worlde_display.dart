@@ -8,19 +8,23 @@ class WordleDisplay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Selector<GameModel, List<List<InputItem>>>(
-      builder: (_, logs, __) {
-        return Column(
-          children: logs
-              .map(
-                (e) => Expanded(
-                  child: WordleDisplayRow(items: e),
-                ),
-              )
-              .toList(),
-        );
+    return Selector<GameModel, int>(
+      selector: (context, model) => model.guessLogs.length,
+      builder: (context, len, child) {
+        List<Widget> children = [];
+
+        for (var i = 0; i < len; i++) {
+          children.add(
+            Expanded(
+              child: WordleDisplayRow(
+                rowIndex: i,
+              ),
+            ),
+          );
+        }
+
+        return Column(children: children);
       },
-      selector: (_, model) => model.guessLogs,
     );
   }
 }

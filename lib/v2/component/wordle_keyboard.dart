@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:wordle/v2/audio/audio.dart';
 import 'package:wordle/v2/component/wordle_character.dart';
+import 'package:wordle/v2/logic/game_logic.dart';
 import 'package:wordle/v2/model/game_model.dart';
 
 class WordleKeyBoard extends StatelessWidget {
@@ -10,7 +11,7 @@ class WordleKeyBoard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Selector<GameModel?, List<InputItem>>(
-      builder: (_, choices, __) {
+      builder: (context, choices, child) {
         return Padding(
           padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 2),
           child: GridView.count(
@@ -22,6 +23,9 @@ class WordleKeyBoard extends StatelessWidget {
                   (e) => OutlinedButton(
                     onPressed: () {
                       internalAudioPlayer.play("keypress-standard.mp3");
+
+                      Provider.of<GameModel>(context, listen: false)
+                          .enterItem(e);
                     },
                     child: WordleCharacter(
                       character: e.character,
@@ -32,7 +36,7 @@ class WordleKeyBoard extends StatelessWidget {
           ),
         );
       },
-      selector: (context, model) => model?.inputChoices ?? [],
+      selector: (context, model) => List.from(model?.inputChoices ?? []),
     );
   }
 }

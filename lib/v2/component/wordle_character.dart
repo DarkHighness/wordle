@@ -3,11 +3,11 @@ import 'package:wordle/v2/model/problem_model.dart';
 
 class WordleCharacter extends StatelessWidget {
   final Character? character;
-  TextStyle characterStyle;
-  TextStyle pinyinStyle;
-  double spacing;
+  final TextStyle characterStyle;
+  final TextStyle pinyinStyle;
+  final double spacing;
 
-  WordleCharacter({
+  const WordleCharacter({
     Key? key,
     required this.character,
     this.characterStyle = const TextStyle(fontSize: 16),
