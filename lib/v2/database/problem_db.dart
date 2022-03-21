@@ -57,7 +57,8 @@ class ProblemDb {
     return ret;
   }
 
-  GameModel randomGame(ProblemType problemType, ProblemDifficulty difficulty) {
+  GameModel randomGame(GameMode gameMode, ProblemType problemType,
+      ProblemDifficulty difficulty) {
     var rand = Random();
     var idx =
         rand.nextInt(_problemCategoryMap[problemType]![difficulty]!.length);
@@ -96,7 +97,10 @@ class ProblemDb {
         .toList();
 
     return GameModel(
-        problem: problem, inputChoices: choices, maxAttempt: gameMaxRetries);
+        gameMode: gameMode,
+        problem: problem,
+        inputChoices: choices,
+        maxAttempt: gameMaxRetries);
   }
 }
 

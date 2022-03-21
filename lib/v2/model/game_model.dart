@@ -9,6 +9,8 @@ enum InputStatus {
   statusInvalid
 }
 
+enum GameMode { modeNormal, modeSpeedRun }
+
 class InputItem {
   Character? character;
   InputStatus status;
@@ -52,10 +54,12 @@ class GameModel extends ChangeNotifier {
   int attempt;
   int cursor;
   GameStatus gameStatus;
+  GameMode gameMode;
   DateTime gameStart;
   DateTime? gameEnd;
 
   GameModel({
+    required this.gameMode,
     required this.problem,
     required this.inputChoices,
     required this.maxAttempt,

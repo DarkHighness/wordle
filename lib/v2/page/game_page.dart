@@ -10,9 +10,11 @@ import 'package:wordle/v2/util/event_bus.dart';
 class GamePage extends StatefulWidget {
   final ProblemType problemType;
   final ProblemDifficulty problemDifficulty;
+  final GameMode gameMode;
 
   const GamePage({
     Key? key,
+    required this.gameMode,
     required this.problemType,
     required this.problemDifficulty,
   }) : super(key: key);
@@ -34,8 +36,8 @@ class GamePageState extends State<GamePage>
   }
 
   void initGameModel(ProblemDb problemDb) {
-    var gameModel =
-        problemDb.randomGame(widget.problemType, widget.problemDifficulty);
+    var gameModel = problemDb.randomGame(
+        widget.gameMode, widget.problemType, widget.problemDifficulty);
 
     gameModel.addListener(() {
       if (gameModel.gameStatus == GameStatus.statusWon ||

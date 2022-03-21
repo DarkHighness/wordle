@@ -23,6 +23,7 @@ class WordleDisplay extends StatefulWidget {
 class _WordleDisplayState extends State<WordleDisplay> {
   late ScreenshotController _controller;
   late EventCallback _callback;
+  late EventBus _bus;
 
   @override
   void initState() {
@@ -30,7 +31,7 @@ class _WordleDisplayState extends State<WordleDisplay> {
 
     _controller = ScreenshotController();
 
-    var bus = context.read<EventBus>();
+    _bus = context.read<EventBus>();
 
     _callback = (_) {
       _controller.capture().then((img) async {
@@ -51,7 +52,14 @@ class _WordleDisplayState extends State<WordleDisplay> {
       });
     };
 
-    bus.register('screenshot', _callback);
+    _bus.register('screenshot', _callback);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+
+    _bus.unregister("screenshot", _callback);
   }
 
   @override

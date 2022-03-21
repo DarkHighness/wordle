@@ -24,6 +24,7 @@ class _WordleDisplayRowState extends State<WordleDisplayRow>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation _shakeAnimation;
+  late EventBus _bus;
   late EventCallback _busCallback;
 
   bool shaking = false;
@@ -54,7 +55,7 @@ class _WordleDisplayRowState extends State<WordleDisplayRow>
       }
     });
 
-    var bus = context.read<EventBus>();
+    _bus = context.read<EventBus>();
 
     _busCallback = (args) {
       if (args == widget.rowIndex) {
@@ -67,16 +68,14 @@ class _WordleDisplayRowState extends State<WordleDisplayRow>
       }
     };
 
-    bus.register("row-shaking", _busCallback);
+    _bus.register("row-shaking", _busCallback);
   }
 
   @override
   void dispose() {
     super.dispose();
 
-    var bus = context.read<EventBus>();
-
-    bus.unregister("row-shaking", _busCallback);
+    _bus.unregister("row-shaking", _busCallback);
   }
 
   @override

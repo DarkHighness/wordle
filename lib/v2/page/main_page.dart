@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg_provider/flutter_svg_provider.dart';
+import 'package:wordle/v2/model/game_model.dart';
 import 'package:wordle/v2/model/problem_model.dart';
 import 'package:wordle/v2/page/game_page.dart';
 
@@ -105,12 +106,18 @@ class _MainPageState extends State<MainPage> {
               onPressed: () {
                 internalAudioPlayer.play("keypress-standard.mp3");
 
-                Navigator.push(context, MaterialPageRoute(builder: (context) {
-                  return const GamePage(
-                    problemType: ProblemType.typeIdiom,
-                    problemDifficulty: ProblemDifficulty.difficultyEasy,
-                  );
-                }));
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) {
+                      return const GamePage(
+                        gameMode: GameMode.modeNormal,
+                        problemType: ProblemType.typeIdiom,
+                        problemDifficulty: ProblemDifficulty.difficultyEasy,
+                      );
+                    },
+                  ),
+                );
               },
               child: const Text("新的成语"),
             ),
@@ -122,12 +129,18 @@ class _MainPageState extends State<MainPage> {
               onPressed: () {
                 internalAudioPlayer.play("keypress-standard.mp3");
 
-                Navigator.push(context, MaterialPageRoute(builder: (context) {
-                  return const GamePage(
-                    problemType: ProblemType.typePoem,
-                    problemDifficulty: ProblemDifficulty.difficultyEasy,
-                  );
-                }));
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) {
+                      return const GamePage(
+                        gameMode: GameMode.modeNormal,
+                        problemType: ProblemType.typePoem,
+                        problemDifficulty: ProblemDifficulty.difficultyEasy,
+                      );
+                    },
+                  ),
+                );
               },
               child: const Text("新的诗词"),
             ),
@@ -138,6 +151,19 @@ class _MainPageState extends State<MainPage> {
               style: style,
               onPressed: () {
                 internalAudioPlayer.play("keypress-standard.mp3");
+
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) {
+                      return const GamePage(
+                        gameMode: GameMode.modeSpeedRun,
+                        problemType: ProblemType.typePoem,
+                        problemDifficulty: ProblemDifficulty.difficultyEasy,
+                      );
+                    },
+                  ),
+                );
               },
               child: const Text("竞速挑战"),
             ),
