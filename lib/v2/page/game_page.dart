@@ -7,10 +7,15 @@ import 'package:wordle/v2/model/problem_model.dart';
 import 'package:wordle/v2/screen/wordle_screen.dart';
 import 'package:wordle/v2/util/event_bus.dart';
 
-import '../audio/audio.dart';
-
 class GamePage extends StatefulWidget {
-  const GamePage({Key? key}) : super(key: key);
+  final ProblemType problemType;
+  final ProblemDifficulty problemDifficulty;
+
+  const GamePage({
+    Key? key,
+    required this.problemType,
+    required this.problemDifficulty,
+  }) : super(key: key);
 
   @override
   GamePageState createState() => GamePageState();
@@ -23,20 +28,14 @@ class GamePageState extends State<GamePage>
 
   @override
   void initState() {
-    internalAudioPlayer.loadAll([
-      "keypress-standard.mp3",
-      "keypress-delete.mp3",
-      "keypress-return.mp3"
-    ]);
-
     _eventBus = EventBus();
 
     super.initState();
   }
 
   void initGameModel(ProblemDb problemDb) {
-    var gameModel = problemDb.randomGame(
-        ProblemType.typeIdiom, ProblemDifficulty.difficultyEasy);
+    var gameModel =
+        problemDb.randomGame(widget.problemType, widget.problemDifficulty);
 
     gameModel.addListener(() {
       if (gameModel.gameStatus == GameStatus.statusWon ||
@@ -61,27 +60,7 @@ class GamePageState extends State<GamePage>
   void resetGameModel() {
     final problemDb = context.read<ProblemDb>();
 
-    var gameModel = problemDb.randomGame(
-        ProblemType.typeIdiom, ProblemDifficulty.difficultyEasy);
-
-    gameModel.addListener(() {
-      if (gameModel.gameStatus == GameStatus.statusWon ||
-          gameModel.gameStatus == GameStatus.statusLose) {
-        showResultDialog();
-      }
-    });
-
-    var _thisGameModel = _gameModel;
-
-    if (_thisGameModel != null) {
-      WidgetsBinding.instance?.addPostFrameCallback((_) {
-        _thisGameModel.dispose();
-      });
-    }
-
-    setState(() {
-      _gameModel = gameModel;
-    });
+    initGameModel(problemDb);
   }
 
   @override

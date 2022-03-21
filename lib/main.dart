@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:wordle/v2/database/problem_db.dart';
-import 'package:wordle/v2/page/game_page.dart';
+import 'package:wordle/v2/page/main_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -27,7 +27,7 @@ class MyApp extends StatelessWidget {
           primarySwatch: Colors.grey,
           fontFamily: "LXGWWenKaiScreen",
         ),
-        home: const GamePage(),
+        home: const MainPage(),
       ),
     );
   }
