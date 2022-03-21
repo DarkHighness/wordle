@@ -96,6 +96,8 @@ class ProblemDb {
         .map((e) => InputItem(character: e))
         .toList();
 
+    choices.shuffle(rand);
+
     return GameModel(
         gameMode: gameMode,
         problem: problem,

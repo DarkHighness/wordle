@@ -1,7 +1,13 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:tuple/tuple.dart';
+import 'package:wordle/v2/config/config.dart';
 import 'package:wordle/v2/database/problem_db.dart';
 import 'package:wordle/v2/dialog/result_dialog.dart';
+import 'package:wordle/v2/dialog/speedrun_result_dialog.dart';
+import 'package:wordle/v2/logic/game_logic.dart';
 import 'package:wordle/v2/model/game_model.dart';
 import 'package:wordle/v2/model/problem_model.dart';
 import 'package:wordle/v2/screen/wordle_screen.dart';
@@ -24,15 +30,26 @@ class GamePage extends StatefulWidget {
 }
 
 class GamePageState extends State<GamePage>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, ChangeNotifier {
   GameModel? _gameModel;
   EventBus? _eventBus;
+
+  DateTime? _gameStart;
+  Timer? _gameTimer;
+  List<Tuple2<ProblemModel, int>>? _speedRunProblems;
 
   @override
   void initState() {
     _eventBus = EventBus();
 
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+
+    _gameTimer?.cancel();
   }
 
   void initGameModel(ProblemDb problemDb) {
@@ -42,7 +59,16 @@ class GamePageState extends State<GamePage>
     gameModel.addListener(() {
       if (gameModel.gameStatus == GameStatus.statusWon ||
           gameModel.gameStatus == GameStatus.statusLose) {
-        showResultDialog();
+        if (widget.gameMode == GameMode.modeNormal) {
+          showResultDialog();
+        } else if (widget.gameMode == GameMode.modeSpeedRun) {
+          if (gameModel.gameStatus == GameStatus.statusWon) {
+            _speedRunProblems!
+                .add(Tuple2(gameModel.problem, gameModel.attempt));
+          }
+
+          resetGameModel();
+        }
       }
     });
 
@@ -54,20 +80,40 @@ class GamePageState extends State<GamePage>
       });
     }
 
+    if (widget.gameMode == GameMode.modeSpeedRun && _gameStart == null) {
+      initSpeedRunGame(gameModel);
+    }
+
     setState(() {
       _gameModel = gameModel;
     });
+  }
+
+  void initSpeedRunGame(GameModel gameModel) {
+    _gameStart = DateTime.now();
+    _speedRunProblems = [];
+
+    _gameTimer = Timer.periodic(
+      const Duration(seconds: 1),
+      (timer) {
+        if (timeLeft.inSeconds == 0 || timeLeft.isNegative) {
+          timer.cancel();
+
+          gameModel.setGameStatus(GameStatus.statusLose);
+
+          showSpeedRunResultDialogInternal(
+              context, modeSpeedRunDuration, _speedRunProblems!);
+        } else {
+          notifyListeners();
+        }
+      },
+    );
   }
 
   void resetGameModel() {
     final problemDb = context.read<ProblemDb>();
 
     initGameModel(problemDb);
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
   }
 
   void showResultDialog() {
@@ -83,6 +129,16 @@ class GamePageState extends State<GamePage>
         selfContext, status, attempt, duration, problem, resetGameModel));
   }
 
+  Duration get timeLeft {
+    if (widget.gameMode != GameMode.modeSpeedRun) {
+      return Duration.zero;
+    }
+
+    var now = DateTime.now();
+
+    return modeSpeedRunDuration - now.difference(_gameStart!);
+  }
+
   @override
   Widget build(BuildContext context) {
     final problemDb = context.watch<ProblemDb?>();
@@ -93,7 +149,7 @@ class GamePageState extends State<GamePage>
 
     return MultiProvider(
       providers: [
-        Provider.value(value: this),
+        ChangeNotifierProvider.value(value: this),
         ChangeNotifierProvider.value(value: _gameModel),
         Provider.value(value: _eventBus),
       ],

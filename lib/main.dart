@@ -27,6 +27,7 @@ class MyApp extends StatelessWidget {
           primarySwatch: Colors.grey,
           fontFamily: "LXGWWenKaiScreen",
         ),
+        initialRoute: "main",
         home: const MainPage(),
       ),
     );

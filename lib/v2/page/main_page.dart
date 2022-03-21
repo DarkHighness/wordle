@@ -109,6 +109,7 @@ class _MainPageState extends State<MainPage> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
+                    settings: const RouteSettings(name: "game"),
                     builder: (context) {
                       return const GamePage(
                         gameMode: GameMode.modeNormal,
@@ -132,6 +133,7 @@ class _MainPageState extends State<MainPage> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
+                    settings: const RouteSettings(name: "game"),
                     builder: (context) {
                       return const GamePage(
                         gameMode: GameMode.modeNormal,
@@ -155,10 +157,11 @@ class _MainPageState extends State<MainPage> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
+                    settings: const RouteSettings(name: "game"),
                     builder: (context) {
                       return const GamePage(
                         gameMode: GameMode.modeSpeedRun,
-                        problemType: ProblemType.typePoem,
+                        problemType: ProblemType.typeIdiom,
                         problemDifficulty: ProblemDifficulty.difficultyEasy,
                       );
                     },

@@ -69,8 +69,8 @@ class _WordleDisplayState extends State<WordleDisplay> {
       builder: (context, len, child) {
         return Screenshot(
           controller: _controller,
-          child: ColoredBox(
-            color: Colors.white,
+          child: Container(
+            color: Colors.white24,
             child: Column(
               children: len
                   .rangeUntil(from: 0)
