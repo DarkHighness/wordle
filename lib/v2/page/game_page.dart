@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:wordle/v2/database/problem_db.dart';
+import 'package:wordle/v2/dialog/result_dialog.dart';
 import 'package:wordle/v2/model/game_model.dart';
 import 'package:wordle/v2/model/problem_model.dart';
 import 'package:wordle/v2/screen/wordle_screen.dart';
@@ -32,9 +33,68 @@ class GamePageState extends State<GamePage> {
     var gameModel = problemDb.randomGame(
         ProblemType.typeIdiom, ProblemDifficulty.difficultyEasy);
 
+    gameModel.addListener(() {
+      if (gameModel.gameStatus == GameStatus.statusWon ||
+          gameModel.gameStatus == GameStatus.statusLose) {
+        showResultDialog();
+      }
+    });
+
+    var _thisGameModel = _gameModel;
+
+    if (_thisGameModel != null) {
+      WidgetsBinding.instance?.addPostFrameCallback((_) {
+        _thisGameModel.dispose();
+      });
+    }
+
     setState(() {
       _gameModel = gameModel;
     });
+  }
+
+  void resetGameModel() {
+    final problemDb = context.read<ProblemDb>();
+
+    var gameModel = problemDb.randomGame(
+        ProblemType.typeIdiom, ProblemDifficulty.difficultyEasy);
+
+    gameModel.addListener(() {
+      if (gameModel.gameStatus == GameStatus.statusWon ||
+          gameModel.gameStatus == GameStatus.statusLose) {
+        showResultDialog();
+      }
+    });
+
+    var _thisGameModel = _gameModel;
+
+    if (_thisGameModel != null) {
+      WidgetsBinding.instance?.addPostFrameCallback((_) {
+        _thisGameModel.dispose();
+      });
+    }
+
+    setState(() {
+      _gameModel = gameModel;
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  void showResultDialog() {
+    var selfContext = context;
+    var gameModel = _gameModel!;
+
+    var status = gameModel.gameStatus;
+    var problem = gameModel.problem;
+    var attempt = gameModel.attempt;
+    var duration = gameModel.duration;
+
+    Future.microtask(() => showResultDialogInternal(
+        selfContext, status, attempt, duration, problem, resetGameModel));
   }
 
   @override
@@ -47,8 +107,8 @@ class GamePageState extends State<GamePage> {
 
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider.value(value: _gameModel),
         Provider.value(value: this),
+        ChangeNotifierProvider.value(value: _gameModel),
       ],
       child: Scaffold(
         body: SafeArea(

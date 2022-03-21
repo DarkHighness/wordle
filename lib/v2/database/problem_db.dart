@@ -92,6 +92,7 @@ class ProblemDb {
 
     var choices = poolList
         .expand((e) => _problemMap[e]!.chars)
+        .toSet()
         .map((e) => InputItem(character: e))
         .toList();
 

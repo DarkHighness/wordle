@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:wordle/v2/component/wordle_display.dart';
 import 'package:wordle/v2/component/wordle_keyboard.dart';
-import 'package:wordle/v2/component/worlde_display.dart';
 
 import '../component/wordle_actions.dart';
 

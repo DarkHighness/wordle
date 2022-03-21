@@ -11,7 +11,7 @@ class WordleCharacter extends StatelessWidget {
     Key? key,
     required this.character,
     this.characterStyle = const TextStyle(fontSize: 16),
-    this.pinyinStyle = const TextStyle(fontSize: 12),
+    this.pinyinStyle = const TextStyle(fontSize: 11),
     this.spacing = 0.0,
   }) : super(key: key);
 

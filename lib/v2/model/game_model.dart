@@ -52,6 +52,8 @@ class GameModel extends ChangeNotifier {
   int attempt;
   int cursor;
   GameStatus gameStatus;
+  DateTime gameStart;
+  DateTime? gameEnd;
 
   GameModel({
     required this.problem,
@@ -64,5 +66,14 @@ class GameModel extends ChangeNotifier {
             growable: false),
         gameStatus = GameStatus.statusRunning,
         attempt = 0,
-        cursor = 0;
+        cursor = 0,
+        gameStart = DateTime.now();
+
+  Duration get duration {
+    if (gameEnd == null) {
+      return Duration.zero;
+    }
+
+    return gameEnd!.difference(gameStart);
+  }
 }
