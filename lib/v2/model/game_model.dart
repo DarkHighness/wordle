@@ -44,7 +44,13 @@ class InputItem {
   }
 }
 
-enum GameStatus { statusWon, statusLose, statusRunning, statusPausing }
+enum GameStatus {
+  statusWon,
+  statusLose,
+  statusSkipped,
+  statusRunning,
+  statusPausing
+}
 
 class GameModel extends ChangeNotifier {
   ProblemModel problem;

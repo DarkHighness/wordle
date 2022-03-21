@@ -3,6 +3,7 @@ import "dart:math";
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:wordle/v2/component/wordle_character.dart';
+import 'package:wordle/v2/component/wordle_display.dart';
 import 'package:wordle/v2/config/color.dart';
 import 'package:wordle/v2/model/problem_model.dart';
 import 'package:wordle/v2/util/event_bus.dart';
@@ -208,16 +209,28 @@ class _WordleDisplayRowItemState extends State<WordleDisplayRowItem>
               alignment: Alignment.center,
             );
           },
-          child: AnimatedContainer(
-            decoration: containerStyle(item),
-            duration: const Duration(milliseconds: 1000),
-            curve: Curves.easeInCubic,
-            child: ScaleTransition(
-              scale: _scaleAnimation,
-              child: WordleCharacter(
-                character: item.character,
-                characterStyle: characterStyle(item),
-                pinyinStyle: pinyinStyle(item),
+          child: Selector<DisplayModel, DisplayStatus>(
+            selector: (context, model) => model.displayStatus,
+            builder: (context, status, child) {
+              if (status == DisplayStatus.statusFull) {
+                return child!;
+              } else {
+                return Container(
+                  decoration: containerStyle(item),
+                );
+              }
+            },
+            child: AnimatedContainer(
+              decoration: containerStyle(item),
+              duration: const Duration(milliseconds: 1000),
+              curve: Curves.easeInCubic,
+              child: ScaleTransition(
+                scale: _scaleAnimation,
+                child: WordleCharacter(
+                  character: item.character,
+                  characterStyle: characterStyle(item),
+                  pinyinStyle: pinyinStyle(item),
+                ),
               ),
             ),
           ),

@@ -13,6 +13,39 @@ import 'package:wordle/v2/util/util.dart';
 
 import '../util/event_bus.dart';
 
+enum DisplayStatus { statusFull, statusShortcut }
+
+class DisplayModel extends ChangeNotifier {
+  late DisplayStatus _displayStatus;
+
+  DisplayModel.full() : _displayStatus = DisplayStatus.statusFull;
+
+  DisplayModel.shortcut() : _displayStatus = DisplayStatus.statusShortcut;
+
+  set displayStatus(DisplayStatus status) {
+    if (status != _displayStatus) {
+      _displayStatus = status;
+      notifyListeners();
+    }
+  }
+
+  DisplayStatus get displayStatus {
+    return _displayStatus;
+  }
+
+  DisplayModel copyWith({
+    DisplayStatus? displayStatus,
+  }) {
+    return DisplayModel(
+      displayStatus: displayStatus ?? _displayStatus,
+    );
+  }
+
+  DisplayModel({
+    required DisplayStatus displayStatus,
+  }) : _displayStatus = displayStatus;
+}
+
 class WordleDisplay extends StatefulWidget {
   const WordleDisplay({Key? key}) : super(key: key);
 
@@ -24,31 +57,41 @@ class _WordleDisplayState extends State<WordleDisplay> {
   late ScreenshotController _controller;
   late EventCallback _callback;
   late EventBus _bus;
+  late DisplayModel _displayModel;
 
   @override
   void initState() {
     super.initState();
 
     _controller = ScreenshotController();
+    _displayModel = DisplayModel.full();
 
     _bus = context.read<EventBus>();
 
     _callback = (_) {
-      _controller.capture().then((img) async {
-        if (img != null) {
-          if (await Permission.storage.request().isGranted) {
-            final directory = await getApplicationDocumentsDirectory();
-            final imagePath =
-                await File('${directory.path}/screenshot.png').create();
-            await imagePath.writeAsBytes(img);
+      setState(() {
+        _displayModel.displayStatus = DisplayStatus.statusShortcut;
 
-            await Share.shareFiles([imagePath.path]);
-          } else {
-            Fluttertoast.showToast(msg: "需要存储访问权限以分享截图");
+        WidgetsBinding.instance?.addPostFrameCallback((_) {
+          _controller.capture().then((img) async {
+            if (img != null) {
+              if (await Permission.storage.request().isGranted) {
+                final directory = await getApplicationDocumentsDirectory();
+                final imagePath =
+                    await File('${directory.path}/screenshot.png').create();
+                await imagePath.writeAsBytes(img);
 
-            openAppSettings();
-          }
-        }
+                await Share.shareFiles([imagePath.path]);
+
+                _displayModel.displayStatus = DisplayStatus.statusFull;
+              } else {
+                Fluttertoast.showToast(msg: "需要存储访问权限以分享截图");
+
+                openAppSettings();
+              }
+            }
+          });
+        });
       });
     };
 
@@ -69,19 +112,24 @@ class _WordleDisplayState extends State<WordleDisplay> {
       builder: (context, len, child) {
         return Screenshot(
           controller: _controller,
-          child: Container(
-            color: Colors.white24,
-            child: Column(
-              children: len
-                  .rangeUntil(from: 0)
-                  .map(
-                    (e) => Expanded(
-                      child: WordleDisplayRow(
-                        rowIndex: e,
+          child: ChangeNotifierProvider.value(
+            value: _displayModel,
+            child: Container(
+              decoration: const BoxDecoration(
+                color: Colors.white,
+              ),
+              child: Column(
+                children: len
+                    .rangeUntil(from: 0)
+                    .map(
+                      (e) => Expanded(
+                        child: WordleDisplayRow(
+                          rowIndex: e,
+                        ),
                       ),
-                    ),
-                  )
-                  .toList(),
+                    )
+                    .toList(),
+              ),
             ),
           ),
         );

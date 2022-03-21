@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:tuple/tuple.dart';
 import 'package:wordle/v2/component/scale_animated_text.dart';
 import 'package:wordle/v2/config/config.dart';
+import 'package:wordle/v2/database/problem_db.dart';
 import 'package:wordle/v2/logic/game_logic.dart';
 import 'package:wordle/v2/model/game_model.dart';
 import 'package:wordle/v2/page/game_page.dart';
@@ -38,15 +39,16 @@ class WordleActions extends StatelessWidget {
 
                   internalAudioPlayer.play("keypress-standard.mp3");
 
-                  var gamePageState = context.read<GamePageState>();
+                  var gameModel = context.read<GameModel>();
 
-                  gamePageState.resetGameModel();
+                  gameModel.setGameStatus(GameStatus.statusSkipped);
                 },
                 onPressed: () {
                   internalAudioPlayer.play("keypress-standard.mp3");
 
+                  var db = context.read<ProblemDb>();
                   var model = context.read<GameModel>();
-                  var checkStatus = model.checkInput();
+                  var checkStatus = model.checkInput(db);
 
                   if (checkStatus == CheckStatus.statusInvalidInput) {
                     context.read<EventBus>().emit("row-shaking", model.attempt);

@@ -36,7 +36,7 @@ class GamePageState extends State<GamePage>
 
   DateTime? _gameStart;
   Timer? _gameTimer;
-  List<Tuple2<ProblemModel, int>>? _speedRunProblems;
+  List<Tuple3<ProblemModel, GameStatus, int>>? _speedRunProblems;
 
   @override
   void initState() {
@@ -58,14 +58,15 @@ class GamePageState extends State<GamePage>
 
     gameModel.addListener(() {
       if (gameModel.gameStatus == GameStatus.statusWon ||
-          gameModel.gameStatus == GameStatus.statusLose) {
+          gameModel.gameStatus == GameStatus.statusLose ||
+          gameModel.gameStatus == GameStatus.statusSkipped) {
         if (widget.gameMode == GameMode.modeNormal) {
           showResultDialog();
         } else if (widget.gameMode == GameMode.modeSpeedRun) {
-          if (gameModel.gameStatus == GameStatus.statusWon) {
-            _speedRunProblems!
-                .add(Tuple2(gameModel.problem, gameModel.attempt));
-          }
+          _speedRunProblems!.add(
+            Tuple3(
+                gameModel.problem, gameModel.gameStatus, gameModel.attempt + 1),
+          );
 
           resetGameModel();
         }

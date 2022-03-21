@@ -1,3 +1,4 @@
+import 'package:wordle/v2/database/problem_db.dart';
 import 'package:wordle/v2/model/game_model.dart';
 
 import '../model/problem_model.dart';
@@ -58,14 +59,18 @@ extension GameLogic on GameModel {
   }
 
   void setGameStatus(GameStatus status) {
-    if (status == GameStatus.statusWon || status == GameStatus.statusLose) {
+    if (status == GameStatus.statusWon ||
+        status == GameStatus.statusLose ||
+        status == GameStatus.statusSkipped) {
       gameEnd = DateTime.now();
     }
 
     gameStatus = status;
+
+    notifyListeners();
   }
 
-  CheckStatus checkInput() {
+  CheckStatus checkInput(ProblemDb db) {
     // 判断是否正在进行
     if (gameStatus != GameStatus.statusRunning) {
       return CheckStatus.statusNotRunning;
@@ -79,6 +84,13 @@ extension GameLogic on GameModel {
     var answer = problem.chars;
     var input = inputLogs[attempt];
     var right = 0;
+
+    var inputWord = input.map((e) => e.character!.char).join();
+
+    if (problem.typeEnum == ProblemType.typeIdiom &&
+        !db.isValidInput(inputWord)) {
+      return CheckStatus.statusInvalidInput;
+    }
 
     for (var i = 0; i < input.length; i++) {
       if (answer[i] == input[i].character!) {
@@ -105,18 +117,25 @@ extension GameLogic on GameModel {
       }
     }
 
+    var notified = false;
+
     if (right == problem.length) {
       setGameStatus(GameStatus.statusWon);
+
+      notified = true;
     } else {
       attempt += 1;
       cursor = 0;
 
       if (attempt >= maxAttempt) {
         setGameStatus(GameStatus.statusLose);
+        notified = true;
       }
     }
 
-    notifyListeners();
+    if (!notified) {
+      notifyListeners();
+    }
 
     return CheckStatus.statusOk;
   }

@@ -23,6 +23,9 @@ Future<void> showResultDialogInternal(
         statusText = "🎉🎉🎉";
       } else if (status == GameStatus.statusLose) {
         statusText = "😭😭😭";
+      } else {
+        throw Exception(
+            "invalid GameStatus when showing result dialog: $status");
       }
 
       return AlertDialog(
