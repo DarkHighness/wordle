@@ -5,6 +5,7 @@ import 'package:wordle/v2/dialog/result_dialog.dart';
 import 'package:wordle/v2/model/game_model.dart';
 import 'package:wordle/v2/model/problem_model.dart';
 import 'package:wordle/v2/screen/wordle_screen.dart';
+import 'package:wordle/v2/util/event_bus.dart';
 
 import '../audio/audio.dart';
 
@@ -15,8 +16,10 @@ class GamePage extends StatefulWidget {
   GamePageState createState() => GamePageState();
 }
 
-class GamePageState extends State<GamePage> {
+class GamePageState extends State<GamePage>
+    with SingleTickerProviderStateMixin {
   GameModel? _gameModel;
+  EventBus? _eventBus;
 
   @override
   void initState() {
@@ -25,6 +28,8 @@ class GamePageState extends State<GamePage> {
       "keypress-delete.mp3",
       "keypress-return.mp3"
     ]);
+
+    _eventBus = EventBus();
 
     super.initState();
   }
@@ -109,6 +114,7 @@ class GamePageState extends State<GamePage> {
       providers: [
         Provider.value(value: this),
         ChangeNotifierProvider.value(value: _gameModel),
+        Provider.value(value: _eventBus),
       ],
       child: Scaffold(
         body: SafeArea(

@@ -2,6 +2,8 @@ import 'package:wordle/v2/model/game_model.dart';
 
 import '../model/problem_model.dart';
 
+enum CheckStatus { statusOk, statusNotRunning, statusInvalidInput }
+
 extension GameLogic on GameModel {
   void enterItem(InputItem item) {
     // 判断是否正在进行
@@ -14,7 +16,7 @@ extension GameLogic on GameModel {
       return;
     }
 
-    guessLogs[attempt][cursor++] =
+    inputLogs[attempt][cursor++] =
         item.copyWith(status: InputStatus.statusInvalid);
 
     notifyListeners();
@@ -31,7 +33,7 @@ extension GameLogic on GameModel {
       return;
     }
 
-    guessLogs[attempt][--cursor] = InputItem.empty();
+    inputLogs[attempt][--cursor] = InputItem.empty();
 
     notifyListeners();
   }
@@ -63,19 +65,19 @@ extension GameLogic on GameModel {
     gameStatus = status;
   }
 
-  void checkInput() {
+  CheckStatus checkInput() {
     // 判断是否正在进行
     if (gameStatus != GameStatus.statusRunning) {
-      return;
+      return CheckStatus.statusNotRunning;
     }
 
     // 判断是否是某一行的末尾
     if (cursor != problem.length) {
-      return;
+      return CheckStatus.statusInvalidInput;
     }
 
     var answer = problem.chars;
-    var input = guessLogs[attempt];
+    var input = inputLogs[attempt];
     var right = 0;
 
     for (var i = 0; i < input.length; i++) {
@@ -115,5 +117,7 @@ extension GameLogic on GameModel {
     }
 
     notifyListeners();
+
+    return CheckStatus.statusOk;
   }
 }

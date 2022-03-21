@@ -1,6 +1,6 @@
 import 'package:json_annotation/json_annotation.dart';
 
-import "../util.dart";
+import '../util/util.dart';
 
 part "problem_model.g.dart";
 

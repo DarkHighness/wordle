@@ -5,6 +5,7 @@ import 'package:wordle/v2/model/game_model.dart';
 import 'package:wordle/v2/page/game_page.dart';
 
 import '../audio/audio.dart';
+import '../util/event_bus.dart';
 
 class WordleActions extends StatelessWidget {
   const WordleActions({Key? key}) : super(key: key);
@@ -27,7 +28,12 @@ class WordleActions extends StatelessWidget {
               onPressed: () {
                 internalAudioPlayer.play("keypress-standard.mp3");
 
-                context.read<GameModel>().checkInput();
+                var model = context.read<GameModel>();
+                var checkStatus = model.checkInput();
+
+                if (checkStatus == CheckStatus.statusInvalidInput) {
+                  context.read<EventBus>().emit("row-shaking", model.attempt);
+                }
               },
               child: const Text("确认"),
             ),
@@ -65,6 +71,10 @@ class WordleActions extends StatelessWidget {
               ),
               onPressed: () {
                 internalAudioPlayer.play("keypress-standard.mp3");
+
+                var bus = context.read<EventBus>();
+
+                bus.emit("screenshot");
               },
               child: const Text("截图"),
             ),

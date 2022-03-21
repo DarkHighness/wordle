@@ -47,7 +47,7 @@ enum GameStatus { statusWon, statusLose, statusRunning, statusPausing }
 class GameModel extends ChangeNotifier {
   ProblemModel problem;
   List<InputItem> inputChoices;
-  List<List<InputItem>> guessLogs;
+  List<List<InputItem>> inputLogs;
   int maxAttempt;
   int attempt;
   int cursor;
@@ -59,7 +59,7 @@ class GameModel extends ChangeNotifier {
     required this.problem,
     required this.inputChoices,
     required this.maxAttempt,
-  })  : guessLogs = List.generate(
+  })  : inputLogs = List.generate(
             maxAttempt,
             (_) => List.generate(problem.length, (_) => InputItem.empty(),
                 growable: false),

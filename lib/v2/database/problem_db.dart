@@ -22,8 +22,8 @@ class ProblemDb {
       var type = problem.typeEnum;
       var diff = problem.difficultyEnum;
 
-      _problemCategoryMap.putIfAbsent(type, () => {});
-      _problemCategoryMap[type]!.putIfAbsent(diff, () => []);
+      _problemCategoryMap[type] ??= {};
+      _problemCategoryMap[type]![diff] ??= [];
       _problemCategoryMap[type]![diff]!.add(hash);
 
       _problemMap[hash] = problem;
@@ -32,9 +32,8 @@ class ProblemDb {
       var words = problem.word.split("");
 
       for (var ch in words) {
-        _relationMap.putIfAbsent(type, () => {});
-        _relationMap[type]!.putIfAbsent(ch, () => {});
-
+        _relationMap[type] ??= {};
+        _relationMap[type]![ch] ??= {};
         _relationMap[type]![ch]!.add(hash);
       }
     }

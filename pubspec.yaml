@@ -39,6 +39,9 @@ dependencies:
   json_annotation: ^4.4.0
   audioplayers: ^0.20.1
   permission_handler: ^9.2.0
+  screenshot: ^1.2.3
+  share_plus: ^4.0.2
+  fluttertoast: ^8.0.9
 
 dev_dependencies:
   flutter_test:
