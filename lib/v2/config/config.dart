@@ -8,7 +8,7 @@ const gameMaxRetries = 6;
 
 const randomPoolRetryLimit = 10;
 
-const modeSpeedRunDuration = Duration(seconds: 5);
+const modeSpeedRunDuration = Duration(minutes: 3);
 const modeSpeedRunEmergingSecs = 30;
 const modeSpeedRunHintSecs = 15;
 const modeSpeedRunHintSkip = 3;

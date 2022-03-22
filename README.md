@@ -8,19 +8,34 @@
 
 * 全离线使用, 不用担心任何记录信息
 
-* 做不出来轻松 hack, 点放弃也能继续做
+* 做不出来也有提示, 要么直接推出重进也能行
 
 * 代码真的写的很**辣鸡**
 
 ## 截图:
 
-![S1](./screenshots/Screenshot_1.jpg)
+![S1](./screenshots/main.jpg)
 
-![S2](./screenshots/Screenshot_2.jpg)
+![S2](./screenshots/screenshot.jpg)
 
-![S3](./screenshots/Screenshot_3.jpg)
+![S2](./screenshots/screenshot_0.jpg)
+
+![S2](./screenshots/screenshot_1.jpg)
+
+![S2](./screenshots/screenshot_2.jpg)
+
+![S2](./screenshots/screenshot_3.jpg)
 
 ## 更新日志:
+
+* 2.0.0
+ * 完全重构代码, 改为 Provider 管理状态
+ * 优化动画效果, 提升动画流畅度
+ * 增加竞速模式, 每15s生成提示, 可以跳过
+ * 增加诗词模式, 初始化提示 25% 的单字
+ * 增加提示功能
+ * 支持截图分享 Wordle 图片
+ * 优化组题逻辑, 区分题目难易度
 
 * 1.0.3
  * 修复了上个版本题目 ID 无法正常工作的问题
@@ -47,8 +62,6 @@
 * 分享题目 ID 后自动唤醒并跳转
 
 * 丰富词库/诗词集, 补全诗词集缺失内容
-
-* **重构代码**
 
 ## 备注:
 
