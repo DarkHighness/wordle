@@ -10,13 +10,23 @@ with open("./assets/THUOCL_poem.txt", "r", encoding="utf-8") as pfp,\
         open("./assets/THUOCL_chengyu.txt", "r", encoding="utf-8") as ffp,\
         open("./assets/idiom.json", "r", encoding="utf-8") as ifp, \
         open("./assets/problems.json", "w", encoding="utf-8") as ofp:
-    poems = set([key.split()[0].strip() for key in pfp])
+    poems = {}
 
-    key = set([key.split()[0].strip() for key in ffp])
+    for key in pfp:
+        key = key.split()
+
+        poems[key[0].strip()] = int(key[1].strip())
+
+    idioms = {}
+
+    for key in ffp:
+        key = key.split()
+
+        idioms[key[0].strip()] = int(key[1].strip())
 
     doc = ujson.load(ifp)
 
-    for poem in poems:
+    for (poem, freq) in poems.items():
         word_hash = hashlib.sha1(poem.encode()).hexdigest()[0:8]
 
         if word_hash in hash_set:
@@ -31,7 +41,7 @@ with open("./assets/THUOCL_poem.txt", "r", encoding="utf-8") as pfp,\
             "pinyin": "",
             "derivation": "无",
             "type": "poem",
-            "difficulty": "easy"
+            "difficulty": "easy" if freq > 10 else "hard"
         })
 
     for idiom in doc:
@@ -47,6 +57,11 @@ with open("./assets/THUOCL_poem.txt", "r", encoding="utf-8") as pfp,\
         else:
             hash_set.add(word_hash)
 
+        difficulty = "hard"
+
+        if word in idioms and idioms[word] > 100:
+            difficulty = "easy"
+
         words.append({
             "hash": word_hash,
             "word": word,
@@ -54,7 +69,7 @@ with open("./assets/THUOCL_poem.txt", "r", encoding="utf-8") as pfp,\
             "pinyin": idiom["pinyin"],
             "derivation": idiom["derivation"],
             "type": "idiom",
-            "difficulty": "easy" if word in key else "hard"
+            "difficulty": difficulty
         })
 
     ujson.dump(words, ofp, ensure_ascii=False)
