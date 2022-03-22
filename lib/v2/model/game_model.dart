@@ -6,10 +6,9 @@ enum InputStatus {
   statusPartialPosition,
   statusPartialCharacter,
   statusMissing,
-  statusInvalid
+  statusInvalid,
+  statusHint
 }
-
-enum GameMode { modeNormal, modeSpeedRun }
 
 class InputItem {
   Character? character;
@@ -52,10 +51,47 @@ enum GameStatus {
   statusPausing
 }
 
+enum GameMode { modeNormal, modeSpeedRun }
+
+enum ProblemHintType { hintTypeMissing, hintTypeOccurs, hintTypeAnswer }
+
+class HintItem {
+  final ProblemHintType hintType;
+  final Character hintCharacter;
+  final int? hintPosition;
+
+  const HintItem({
+    required this.hintType,
+    required this.hintCharacter,
+    this.hintPosition,
+  }) : assert(hintType != ProblemHintType.hintTypeAnswer ||
+            (hintType == ProblemHintType.hintTypeAnswer &&
+                hintPosition != null));
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is HintItem &&
+          runtimeType == other.runtimeType &&
+          hintType == other.hintType &&
+          hintCharacter == other.hintCharacter &&
+          hintPosition == other.hintPosition;
+
+  @override
+  int get hashCode =>
+      hintType.hashCode ^ hintCharacter.hashCode ^ hintPosition.hashCode;
+}
+
 class GameModel extends ChangeNotifier {
   ProblemModel problem;
   List<InputItem> inputChoices;
   List<List<InputItem>> inputLogs;
+  List<HintItem> hints;
+
+  // 成语是相对于 0 提示
+  // 故事是相对于 hintLength 的提示
+  int hintsIndex;
+
   int maxAttempt;
   int attempt;
   int cursor;
@@ -68,6 +104,7 @@ class GameModel extends ChangeNotifier {
     required this.gameMode,
     required this.problem,
     required this.inputChoices,
+    required this.hints,
     required this.maxAttempt,
   })  : inputLogs = List.generate(
             maxAttempt,
@@ -75,6 +112,7 @@ class GameModel extends ChangeNotifier {
                 growable: false),
             growable: false),
         gameStatus = GameStatus.statusRunning,
+        hintsIndex = 0,
         attempt = 0,
         cursor = 0,
         gameStart = DateTime.now();

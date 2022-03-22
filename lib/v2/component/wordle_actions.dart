@@ -17,7 +17,7 @@ class WordleActions extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Selector<GameModel, GameStatus>(
-      selector: (context, model) => (model.gameStatus),
+      selector: (context, model) => model.gameStatus,
       builder: (context, status, child) {
         return Selector<GamePageState, Tuple2<GameMode, Duration>>(
           selector: (context, state) =>
@@ -33,15 +33,15 @@ class WordleActions extends StatelessWidget {
                       const EdgeInsets.symmetric(vertical: 4, horizontal: 32)),
                 ),
                 onLongPress: () {
-                  if (item.item1 != GameMode.modeSpeedRun) {
-                    return;
-                  }
-
                   internalAudioPlayer.play("keypress-standard.mp3");
 
-                  var gameModel = context.read<GameModel>();
+                  var gamePageState = context.read<GamePageState>();
 
-                  gameModel.setGameStatus(GameStatus.statusSkipped);
+                  if (item.item1 == GameMode.modeSpeedRun) {
+                    gamePageState.setGameStatus(GameStatus.statusSkipped);
+                  } else {
+                    gamePageState.nextHint();
+                  }
                 },
                 onPressed: () {
                   internalAudioPlayer.play("keypress-standard.mp3");
@@ -56,7 +56,7 @@ class WordleActions extends StatelessWidget {
                 },
                 child: item.item1 == GameMode.modeSpeedRun
                     ? const Text("确认/长按跳过")
-                    : const Text("确认"),
+                    : const Text("确认/长按提示"),
               );
 
               var backspaceButton = OutlinedButton(

@@ -48,11 +48,27 @@ Future<void> showSpeedRunResultDialogInternal(
           ],
         );
 
-        children.addAll(
-          problems.map(
-            (e) => Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              child: Text(e.item1.word),
+        children.add(
+          SizedBox(
+            height: MediaQuery.of(context).size.height / 3,
+            width: MediaQuery.of(context).size.width / 2,
+            child: ListView.builder(
+              itemBuilder: (context, index) {
+                var item = problems[index];
+                var status = "";
+
+                if (item.item2 == GameStatus.statusLose) {
+                  status = "(失败)";
+                } else if (item.item2 == GameStatus.statusSkipped) {
+                  status = "(跳过)";
+                }
+
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: Text("${item.item1.word}$status"),
+                );
+              },
+              itemCount: problems.length,
             ),
           ),
         );

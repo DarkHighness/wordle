@@ -52,6 +52,14 @@ class ProblemModel {
     return word.length;
   }
 
+  int get hintLength {
+    if (typeEnum == ProblemType.typePoem) {
+      return (length * 0.25).round();
+    } else {
+      return 0;
+    }
+  }
+
   ProblemType get typeEnum {
     if (type == "idiom") {
       return ProblemType.typeIdiom;

@@ -85,7 +85,8 @@ class _WordleDisplayState extends State<WordleDisplay> {
 
                 _displayModel.displayStatus = DisplayStatus.statusFull;
               } else {
-                Fluttertoast.showToast(msg: "需要存储访问权限以分享截图");
+                Fluttertoast.showToast(
+                    msg: "需要存储访问权限以分享截图", toastLength: Toast.LENGTH_SHORT);
 
                 openAppSettings();
               }

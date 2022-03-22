@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:flutter/services.dart';
+import 'package:tuple/tuple.dart';
 import 'package:wordle/v1/wordle/config.dart';
 import 'package:wordle/v2/config/config.dart';
 import 'package:wordle/v2/model/game_model.dart';
@@ -94,7 +95,87 @@ class ProblemDb {
         .expand((e) => _problemMap[e]!.chars)
         .toSet()
         .map((e) => InputItem(character: e))
-        .toList();
+        .toList(growable: false);
+
+    choices.shuffle(rand);
+
+    List<HintItem> hintItems = [];
+
+    // 生成提示
+    if (problemType == ProblemType.typePoem) {
+      var len = problem.hintLength;
+
+      var hintAnswers = problem.chars
+          .asMap()
+          .entries
+          .map((e) => Tuple2(e.key, e.value))
+          .toList(growable: false);
+
+      hintAnswers.shuffle(rand);
+
+      var hintStage1 = hintAnswers
+          .take(len + poemHintAnswerCount)
+          .map((e) => HintItem(
+              hintType: ProblemHintType.hintTypeAnswer,
+              hintCharacter: e.item2,
+              hintPosition: e.item1))
+          .toList(growable: false);
+
+      // 然后按照不出现, 出现, 正确的方式生成提示
+      var hintStage2 = choices
+          .where(
+              (v) => hintAnswers.indexWhere((e) => e.item2 == v.character) < 0)
+          .take(poemHintMissingCount)
+          .map((e) => HintItem(
+              hintType: ProblemHintType.hintTypeMissing,
+              hintCharacter: e.character!));
+
+      var hintStage3 = hintAnswers
+          .where((v) =>
+              hintStage1.indexWhere((e) => e.hintCharacter == v.item2) < len)
+          .take(poemHintOccursCount)
+          .map((e) => HintItem(
+              hintType: ProblemHintType.hintTypeOccurs,
+              hintCharacter: e.item2));
+
+      var hintStage4 = hintStage1.reversed.take(poemHintAnswerCount);
+
+      hintStage1 = hintStage1.take(len).toList();
+
+      hintItems = [...hintStage1, ...hintStage2, ...hintStage3, ...hintStage4];
+    } else if (problemType == ProblemType.typeIdiom) {
+      var hintAnswers = problem.chars
+          .asMap()
+          .entries
+          .map((e) => Tuple2(e.key, e.value))
+          .toList(growable: false);
+
+      hintAnswers.shuffle(rand);
+
+      var hintStage3 = hintAnswers.take(idiomHintAnswerCount).map((e) =>
+          HintItem(
+              hintType: ProblemHintType.hintTypeAnswer,
+              hintCharacter: e.item2,
+              hintPosition: e.item1));
+
+      // 然后按照不出现, 出现的方式生成提示
+      var hintStage1 = choices
+          .where(
+              (v) => hintAnswers.indexWhere((e) => e.item2 == v.character) < 0)
+          .take(poemHintMissingCount)
+          .map((e) => HintItem(
+              hintType: ProblemHintType.hintTypeMissing,
+              hintCharacter: e.character!));
+
+      hintAnswers.shuffle(rand);
+
+      var hintStage2 = hintAnswers.take(idiomHintOccursCount).map((e) =>
+          HintItem(
+              hintType: ProblemHintType.hintTypeOccurs,
+              hintCharacter: e.item2));
+
+      hintItems = [...hintStage1, ...hintStage2, ...hintStage3];
+    }
 
     choices.shuffle(rand);
 
@@ -102,6 +183,7 @@ class ProblemDb {
         gameMode: gameMode,
         problem: problem,
         inputChoices: choices,
+        hints: hintItems,
         maxAttempt: gameMaxRetries);
   }
 }

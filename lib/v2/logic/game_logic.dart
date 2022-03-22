@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:wordle/v2/database/problem_db.dart';
 import 'package:wordle/v2/model/game_model.dart';
 
@@ -17,10 +19,20 @@ extension GameLogic on GameModel {
       return;
     }
 
-    inputLogs[attempt][cursor++] =
-        item.copyWith(status: InputStatus.statusInvalid);
+    var input = inputLogs[attempt];
 
-    notifyListeners();
+    while (cursor < problem.length &&
+        input[cursor].status == InputStatus.statusHint) {
+      cursor++;
+    }
+
+    if (cursor != problem.length) {
+      input[cursor] = item.copyWith(status: InputStatus.statusInvalid);
+
+      cursor++;
+
+      notifyListeners();
+    }
   }
 
   void backspaceItem() {
@@ -34,9 +46,18 @@ extension GameLogic on GameModel {
       return;
     }
 
-    inputLogs[attempt][--cursor] = InputItem.empty();
+    var input = inputLogs[attempt];
 
-    notifyListeners();
+    while (
+        cursor >= 0 && input[--cursor].status != InputStatus.statusInvalid) {}
+
+    if (cursor >= 0 && input[cursor].status == InputStatus.statusInvalid) {
+      inputLogs[attempt][cursor] = InputItem.empty();
+
+      notifyListeners();
+    } else {
+      cursor = max(0, cursor);
+    }
   }
 
   void setInputCharacterStatus(Character character, InputStatus status) {
@@ -76,13 +97,17 @@ extension GameLogic on GameModel {
       return CheckStatus.statusNotRunning;
     }
 
+    var input = inputLogs[attempt];
+    var inputCnt = input
+        .map((e) => e.character == null ? 0 : 1)
+        .reduce((acc, v) => acc + v);
+
     // 判断是否是某一行的末尾
-    if (cursor != problem.length) {
+    if (inputCnt != problem.length) {
       return CheckStatus.statusInvalidInput;
     }
 
     var answer = problem.chars;
-    var input = inputLogs[attempt];
     var right = 0;
 
     var inputWord = input.map((e) => e.character!.char).join();
@@ -130,6 +155,8 @@ extension GameLogic on GameModel {
       if (attempt >= maxAttempt) {
         setGameStatus(GameStatus.statusLose);
         notified = true;
+      } else {
+        renderHint();
       }
     }
 
@@ -138,5 +165,66 @@ extension GameLogic on GameModel {
     }
 
     return CheckStatus.statusOk;
+  }
+
+  void renderHint() {
+    var idx = hintsIndex +
+        (problem.typeEnum == ProblemType.typePoem ? problem.hintLength : 0);
+
+    var input = inputLogs[attempt];
+
+    for (var i = 0; i < idx; i++) {
+      var hint = hints[i];
+
+      switch (hint.hintType) {
+        case ProblemHintType.hintTypeMissing:
+          // 注意的是, 输入框中不采用 hint 作为标识
+          setInputCharacterStatus(
+              hint.hintCharacter, InputStatus.statusMissing);
+          break;
+        case ProblemHintType.hintTypeOccurs:
+          // 注意的是, 输入框中不采用 hint 作为标识
+          setInputCharacterStatus(
+              hint.hintCharacter, InputStatus.statusPartialPosition);
+          break;
+        case ProblemHintType.hintTypeAnswer:
+          var item = input[hint.hintPosition!];
+
+          item.character = hint.hintCharacter;
+          item.status = InputStatus.statusHint;
+          // 注意的是, 输入框中不采用 hint 作为标识
+          setInputCharacterStatus(hint.hintCharacter, InputStatus.statusOk);
+          break;
+      }
+    }
+
+    notifyListeners();
+  }
+
+  bool skipHint({required int skip}) {
+    var idx = hintsIndex +
+        (problem.typeEnum == ProblemType.typePoem ? problem.hintLength : 0) +
+        skip;
+
+    if (idx > hints.length) {
+      return false;
+    } else {
+      hintsIndex = idx -
+          (problem.typeEnum == ProblemType.typePoem ? problem.hintLength : 0);
+      return true;
+    }
+  }
+
+  bool nextHint() {
+    var idx = hintsIndex +
+        (problem.typeEnum == ProblemType.typePoem ? problem.hintLength : 0);
+
+    if (idx > hints.length) {
+      return false;
+    } else {
+      hintsIndex++;
+
+      return true;
+    }
   }
 }

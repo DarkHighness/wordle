@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:tuple/tuple.dart';
 import 'package:wordle/v2/config/config.dart';
@@ -47,9 +48,9 @@ class GamePageState extends State<GamePage>
 
   @override
   void dispose() {
-    super.dispose();
-
     _gameTimer?.cancel();
+
+    super.dispose();
   }
 
   void initGameModel(ProblemDb problemDb) {
@@ -73,6 +74,8 @@ class GamePageState extends State<GamePage>
       }
     });
 
+    gameModel.renderHint();
+
     var _thisGameModel = _gameModel;
 
     if (_thisGameModel != null) {
@@ -82,7 +85,7 @@ class GamePageState extends State<GamePage>
     }
 
     if (widget.gameMode == GameMode.modeSpeedRun && _gameStart == null) {
-      initSpeedRunGame(gameModel);
+      initSpeedRunGame();
     }
 
     setState(() {
@@ -90,7 +93,7 @@ class GamePageState extends State<GamePage>
     });
   }
 
-  void initSpeedRunGame(GameModel gameModel) {
+  void initSpeedRunGame() {
     _gameStart = DateTime.now();
     _speedRunProblems = [];
 
@@ -100,11 +103,20 @@ class GamePageState extends State<GamePage>
         if (timeLeft.inSeconds == 0 || timeLeft.isNegative) {
           timer.cancel();
 
-          gameModel.setGameStatus(GameStatus.statusLose);
+          _gameModel!.setGameStatus(GameStatus.statusLose);
 
           showSpeedRunResultDialogInternal(
               context, modeSpeedRunDuration, _speedRunProblems!);
         } else {
+          // 竞速模式下, 跳过前3条提示
+          if (_gameModel!.hintsIndex == 0) {
+            _gameModel!.skipHint(skip: modeSpeedRunHintSkip);
+          }
+
+          if (timeLeft.inSeconds % modeSpeedRunHintSecs == 0) {
+            nextHint();
+          }
+
           notifyListeners();
         }
       },
@@ -115,6 +127,18 @@ class GamePageState extends State<GamePage>
     final problemDb = context.read<ProblemDb>();
 
     initGameModel(problemDb);
+  }
+
+  void nextHint() {
+    if (_gameModel!.nextHint()) {
+      _gameModel!.renderHint();
+    } else if (_gameModel!.gameMode != GameMode.modeSpeedRun) {
+      Fluttertoast.showToast(msg: "没有更多提示了...", toastLength: Toast.LENGTH_LONG);
+    }
+  }
+
+  void setGameStatus(GameStatus status) {
+    _gameModel!.setGameStatus(status);
   }
 
   void showResultDialog() {
