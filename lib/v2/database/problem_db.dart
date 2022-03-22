@@ -3,7 +3,6 @@ import 'dart:math';
 
 import 'package:flutter/services.dart';
 import 'package:tuple/tuple.dart';
-import 'package:wordle/v1/wordle/config.dart';
 import 'package:wordle/v2/config/config.dart';
 import 'package:wordle/v2/model/game_model.dart';
 import 'package:wordle/v2/model/problem_model.dart';
@@ -77,7 +76,7 @@ class ProblemDb {
     for (var i = 0;
         i < pool.length &&
             pool.length < minPoolSize &&
-            i < maxRandomPoolRetries;
+            i < randomPoolRetryLimit;
         i++) {
       pool.addAll(_collectRelatedProblemIds(pool.elementAt(i)));
     }
