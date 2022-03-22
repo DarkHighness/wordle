@@ -41,7 +41,8 @@ with open("./assets/THUOCL_poem.txt", "r", encoding="utf-8") as pfp,\
             "pinyin": "",
             "derivation": "无",
             "type": "poem",
-            "difficulty": "easy" if freq > 10 else "hard"
+            "difficulty": "easy" if freq > 10 else "hard",
+            "freq": freq
         })
 
     for idiom in doc:
@@ -58,9 +59,11 @@ with open("./assets/THUOCL_poem.txt", "r", encoding="utf-8") as pfp,\
             hash_set.add(word_hash)
 
         difficulty = "hard"
+        freq = 0
 
         if word in idioms and idioms[word] > 100:
             difficulty = "easy"
+            freq = idioms[word]
 
         words.append({
             "hash": word_hash,
@@ -69,7 +72,8 @@ with open("./assets/THUOCL_poem.txt", "r", encoding="utf-8") as pfp,\
             "pinyin": idiom["pinyin"],
             "derivation": idiom["derivation"],
             "type": "idiom",
-            "difficulty": difficulty
+            "difficulty": difficulty,
+            "freq": freq
         })
 
     ujson.dump(words, ofp, ensure_ascii=False)
