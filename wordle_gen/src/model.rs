@@ -1,3 +1,5 @@
+use std::cmp::min;
+
 use counter::Counter;
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
@@ -20,10 +22,12 @@ pub struct Problem {
     pub word: String,
     pub hash: String,
     pub difficulty: String,
+    #[serde(skip_serializing, skip_deserializing)]
     pub freq: i32,
     #[serde(skip_serializing, skip_deserializing)]
     pub prop: Counter<char>,
     pub similar: Vec<String>,
+    pub r#type: String,
 }
 
 impl Problem {
@@ -34,6 +38,7 @@ impl Problem {
         derivation: String,
         difficulty: String,
         freq: i32,
+        r#type: String,
     ) -> Self {
         let mut sha256 = Sha256::new();
 
@@ -54,14 +59,22 @@ impl Problem {
             freq,
             prop: counter,
             similar: Vec::new(),
+            r#type
         }
     }
 
     pub fn similarity(&self, other: &Self) -> f64 {
-        let diff = self.prop.clone() - other.prop.clone();
-        let len = self.word.len() as f64;
-        let p = diff.iter().map(|e| e.1).sum::<usize>() as f64;
+        let mut h = 0;
 
-        return 1.0 - p / len;
+        self.prop.iter().for_each(|e| {
+            let p = other.prop.get(e.0).map_or_else(|| 0, |e| *e);
+
+            h += min(p, *e.1);
+        });
+
+        let h = h as f64;
+        let len = self.word.chars().count() as f64;
+
+        return h / len;
     }
 }
