@@ -14,6 +14,8 @@ ProblemModel _$ProblemModelFromJson(Map<String, dynamic> json) => ProblemModel(
       json['derivation'] as String,
       json['type'] as String,
       json['difficulty'] as String,
+      (json['similar'] as List<dynamic>).map((e) => e as String).toList(),
+      json['freq'] as int,
     );
 
 Map<String, dynamic> _$ProblemModelToJson(ProblemModel instance) =>
@@ -25,4 +27,6 @@ Map<String, dynamic> _$ProblemModelToJson(ProblemModel instance) =>
       'derivation': instance.derivation,
       'type': instance.type,
       'difficulty': instance.difficulty,
+      'freq': instance.freq,
+      'similar': instance.similar,
     };

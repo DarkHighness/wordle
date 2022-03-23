@@ -14,7 +14,6 @@ class ProblemDb {
       _problemCategoryMap = {};
 
   final Set<String> _validInput = {};
-  final Map<ProblemType, Map<String, Set<ProblemId>>> _relationMap = {};
 
   ProblemDb.fromProblems(this._problems) {
     for (var problem in _problems) {
@@ -28,33 +27,11 @@ class ProblemDb {
 
       _problemMap[hash] = problem;
       _validInput.add(problem.word);
-
-      var words = problem.word.split("");
-
-      for (var ch in words) {
-        _relationMap[type] ??= {};
-        _relationMap[type]![ch] ??= {};
-        _relationMap[type]![ch]!.add(hash);
-      }
     }
   }
 
   bool isValidInput(String input) {
     return _validInput.contains(input);
-  }
-
-  Set<ProblemId> _collectRelatedProblemIds(ProblemId problemId) {
-    Set<ProblemId> ret = {};
-
-    var problem = _problemMap[problemId]!;
-    var type = problem.typeEnum;
-    var words = problem.word.split("");
-
-    for (var ch in words) {
-      ret.addAll(_relationMap[type]![ch]!);
-    }
-
-    return ret;
   }
 
   GameModel randomGame(GameMode gameMode, ProblemType problemType,
@@ -68,7 +45,8 @@ class ProblemDb {
 
     rand = Random(hash.codeUnits.reduce((s, e) => s ^ e));
 
-    var pool = _collectRelatedProblemIds(hash);
+    var pool = problem.similar;
+
     var minPoolSize = difficulty == ProblemDifficulty.difficultyHard
         ? minRandomPoolSizeHard
         : minRandomPoolSizeEasy;
@@ -78,19 +56,20 @@ class ProblemDb {
             pool.length < minPoolSize &&
             i < randomPoolRetryLimit;
         i++) {
-      pool.addAll(_collectRelatedProblemIds(pool.elementAt(i)));
+      pool.addAll(_problemMap[pool[i]]!.similar);
     }
 
-    var poolList = pool.toList();
-    var poolListCnt = difficulty == ProblemDifficulty.difficultyHard
+    pool.sort((a, b) => _problemMap[b]!.freq - _problemMap[a]!.freq);
+
+    var poolCnt = difficulty == ProblemDifficulty.difficultyHard
         ? problemPoolSizeHard
         : problemPoolSizeEasy;
 
-    poolList.shuffle(rand);
-    poolList = poolList.take(poolListCnt).toList();
-    poolList.add(hash);
+    pool.shuffle(rand);
+    pool = pool.take(poolCnt).toList();
+    pool.add(hash);
 
-    var choices = poolList
+    var choices = pool
         .expand((e) => _problemMap[e]!.chars)
         .toSet()
         .map((e) => InputItem(character: e))

@@ -101,84 +101,150 @@ class _MainPageState extends State<MainPage> {
             SizedBox.fromSize(
               size: const Size.fromHeight(32),
             ),
-            ElevatedButton(
-              style: style,
-              onPressed: () {
-                internalAudioPlayer.play("keypress-standard.mp3");
+            SizedBox(
+              width: MediaQuery.of(context).size.width * 0.85,
+              child: ElevatedButton(
+                style: style,
+                onPressed: () {
+                  internalAudioPlayer.play("keypress-standard.mp3");
 
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    settings: const RouteSettings(name: "game"),
-                    builder: (context) {
-                      return const GamePage(
-                        gameMode: GameMode.modeNormal,
-                        problemType: ProblemType.typeIdiom,
-                        problemDifficulty: ProblemDifficulty.difficultyEasy,
-                      );
-                    },
-                  ),
-                );
-              },
-              child: const Text("新的成语"),
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      settings: const RouteSettings(name: "game"),
+                      builder: (context) {
+                        return const GamePage(
+                          gameMode: GameMode.modeNormal,
+                          problemType: ProblemType.typeIdiom,
+                          problemDifficulty: ProblemDifficulty.difficultyEasy,
+                        );
+                      },
+                    ),
+                  );
+                },
+                child: const Text("新的成语"),
+              ),
             ),
             SizedBox.fromSize(
               size: const Size.fromHeight(8),
             ),
-            ElevatedButton(
-              style: style,
-              onPressed: () {
-                internalAudioPlayer.play("keypress-standard.mp3");
+            SizedBox(
+              width: MediaQuery.of(context).size.width * 0.85,
+              child: ElevatedButton(
+                style: style,
+                onPressed: () {
+                  internalAudioPlayer.play("keypress-standard.mp3");
 
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    settings: const RouteSettings(name: "game"),
-                    builder: (context) {
-                      return const GamePage(
-                        gameMode: GameMode.modeNormal,
-                        problemType: ProblemType.typePoem,
-                        problemDifficulty: ProblemDifficulty.difficultyEasy,
-                      );
-                    },
-                  ),
-                );
-              },
-              child: const Text("新的诗词"),
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      settings: const RouteSettings(name: "game"),
+                      builder: (context) {
+                        return const GamePage(
+                          gameMode: GameMode.modeNormal,
+                          problemType: ProblemType.typeIdiom,
+                          problemDifficulty: ProblemDifficulty.difficultyHard,
+                        );
+                      },
+                    ),
+                  );
+                },
+                child: const Text("新的成语(困难)"),
+              ),
             ),
             SizedBox.fromSize(
               size: const Size.fromHeight(8),
             ),
-            ElevatedButton(
-              style: style,
-              onPressed: () {
-                internalAudioPlayer.play("keypress-standard.mp3");
+            SizedBox(
+              width: MediaQuery.of(context).size.width * 0.85,
+              child: ElevatedButton(
+                style: style,
+                onPressed: () {
+                  internalAudioPlayer.play("keypress-standard.mp3");
 
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    settings: const RouteSettings(name: "game"),
-                    builder: (context) {
-                      return const GamePage(
-                        gameMode: GameMode.modeSpeedRun,
-                        problemType: ProblemType.typeIdiom,
-                        problemDifficulty: ProblemDifficulty.difficultyEasy,
-                      );
-                    },
-                  ),
-                );
-              },
-              child: const Text("竞速挑战"),
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      settings: const RouteSettings(name: "game"),
+                      builder: (context) {
+                        return const GamePage(
+                          gameMode: GameMode.modeNormal,
+                          problemType: ProblemType.typePoem,
+                          problemDifficulty: ProblemDifficulty.difficultyEasy,
+                        );
+                      },
+                    ),
+                  );
+                },
+                child: const Text("新的诗词"),
+              ),
             ),
             SizedBox.fromSize(
               size: const Size.fromHeight(8),
             ),
-            ElevatedButton(
-              style: style,
-              onPressed: () {
-                internalAudioPlayer.play("keypress-standard.mp3");
-              },
-              child: const Text("统计信息"),
+            SizedBox(
+              width: MediaQuery.of(context).size.width * 0.85,
+              child: ElevatedButton(
+                style: style,
+                onPressed: () {
+                  internalAudioPlayer.play("keypress-standard.mp3");
+
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      settings: const RouteSettings(name: "game"),
+                      builder: (context) {
+                        return const GamePage(
+                          gameMode: GameMode.modeNormal,
+                          problemType: ProblemType.typePoem,
+                          problemDifficulty: ProblemDifficulty.difficultyHard,
+                        );
+                      },
+                    ),
+                  );
+                },
+                child: const Text("新的诗词(困难)"),
+              ),
+            ),
+            SizedBox.fromSize(
+              size: const Size.fromHeight(8),
+            ),
+            SizedBox(
+              width: MediaQuery.of(context).size.width * 0.85,
+              child: ElevatedButton(
+                style: style,
+                onPressed: () {
+                  internalAudioPlayer.play("keypress-standard.mp3");
+
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      settings: const RouteSettings(name: "game"),
+                      builder: (context) {
+                        return const GamePage(
+                          gameMode: GameMode.modeSpeedRun,
+                          problemType: ProblemType.typeIdiom,
+                          problemDifficulty: ProblemDifficulty.difficultyEasy,
+                        );
+                      },
+                    ),
+                  );
+                },
+                child: const Text("竞速挑战"),
+              ),
+            ),
+            SizedBox.fromSize(
+              size: const Size.fromHeight(8),
+            ),
+            SizedBox(
+              width: MediaQuery.of(context).size.width * 0.85,
+              child: ElevatedButton(
+                style: style,
+                onPressed: () {
+                  internalAudioPlayer.play("keypress-standard.mp3");
+                },
+                child: const Text("统计信息"),
+              ),
             )
           ],
         ),

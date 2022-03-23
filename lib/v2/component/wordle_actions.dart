@@ -64,12 +64,19 @@ class WordleActions extends StatelessWidget {
                   padding: MaterialStateProperty.all(
                       const EdgeInsets.symmetric(vertical: 4, horizontal: 32)),
                 ),
+                onLongPress: () {
+                  internalAudioPlayer.play("keypress-delete.mp3");
+
+                  var gamePageState = context.read<GamePageState>();
+
+                  gamePageState.setGameStatus(GameStatus.statusSkipped);
+                },
                 onPressed: () {
                   internalAudioPlayer.play("keypress-delete.mp3");
 
                   context.read<GameModel>().backspaceItem();
                 },
-                child: const Text("删除"),
+                child: const Text("删除/长按放弃"),
               );
 
               if (item.item1 == GameMode.modeSpeedRun) {

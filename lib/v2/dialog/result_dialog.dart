@@ -21,7 +21,8 @@ Future<void> showResultDialogInternal(
       var statusText = "";
       if (status == GameStatus.statusWon) {
         statusText = "🎉🎉🎉";
-      } else if (status == GameStatus.statusLose) {
+      } else if (status == GameStatus.statusLose ||
+          status == GameStatus.statusSkipped) {
         statusText = "😭😭😭";
       } else {
         throw Exception(

@@ -44,9 +44,11 @@ class ProblemModel {
   final String derivation;
   final String type;
   final String difficulty;
+  final int freq;
+  final List<String> similar;
 
   ProblemModel(this.hash, this.word, this.pinyin, this.explanation,
-      this.derivation, this.type, this.difficulty);
+      this.derivation, this.type, this.difficulty, this.similar, this.freq);
 
   int get length {
     return word.length;
