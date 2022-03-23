@@ -1,11 +1,11 @@
 #![feature(slice_group_by)]
 
+use counter::Counter;
 use std::{
-    collections::HashMap,
+    collections::{HashMap, HashSet},
     fs::{self, File},
     io::BufWriter,
 };
-use counter::Counter;
 
 use crate::model::{Idiom, Problem};
 
@@ -33,7 +33,7 @@ fn main() {
             .map(|e| {
                 let freq = idiom_freq.get(e.word.as_str()).cloned().unwrap_or(0);
 
-                let difficulty = if freq > 100 { "easy" } else { "hard" }.to_string();
+                let difficulty = if freq > 50 { "easy" } else { "hard" }.to_string();
 
                 Problem::new(
                     e.word,
@@ -42,9 +42,10 @@ fn main() {
                     e.derivation,
                     difficulty,
                     freq,
-                    "idiom".to_string()
+                    "idiom".to_string(),
                 )
             })
+            .filter(|e| e.word.chars().count() == 4)
             .collect()
     };
 
@@ -64,7 +65,7 @@ fn main() {
         poem_freq
             .into_iter()
             .map(|e| {
-                let difficulty = if e.1 > 100 { "easy" } else { "hard" }.to_string();
+                let difficulty = if e.1 > 10 { "easy" } else { "hard" }.to_string();
 
                 Problem::new(
                     e.0,
@@ -73,33 +74,58 @@ fn main() {
                     "".to_string(),
                     difficulty,
                     e.1,
-                    "poem".to_string()
+                    "poem".to_string(),
                 )
             })
             .collect()
     };
 
     {
-        let problem_similar = calculate_similarity(&mut idioms);
-
-        fill_similarity(&mut idioms, problem_similar);
+        let map = calculate_similarity(&mut idioms);
+        fill_similarity(&mut idioms, map);
     }
 
     {
-        let problem_similar = calculate_similarity(&mut poems);
+        let map = calculate_similarity(&mut poems);
 
-        fill_similarity(&mut poems, problem_similar);
+        fill_similarity(&mut poems, map);
     }
 
-    let file = File::create("problem.json").unwrap();
+    let file = File::create("problems.json").unwrap();
     let writer = BufWriter::new(file);
 
     idioms.extend(poems);
 
-    let problems: Vec<Problem> = idioms.into_iter().filter(|e| e.similar.len() > 0).collect();
+    let problems: Vec<Problem> = {
+        // let problems: Vec<Problem> = idioms.into_iter().filter(|e| e.similar.len() > 0).collect();
+
+        let problems = idioms;
+
+        let problem_set: HashSet<String> = problems
+            .as_slice()
+            .into_iter()
+            .map(|e| e.hash.to_string())
+            .collect();
+
+        problems
+            .into_iter()
+            .map(|mut e| {
+                e.similar = e
+                    .similar
+                    .into_iter()
+                    .filter(|s| problem_set.contains(s.as_str()))
+                    .collect();
+
+                e
+            })
+            .collect()
+    };
 
     {
-        let count = problems.as_slice().into_iter().map(|e| (e.r#type.as_str(), e.difficulty.as_str()));
+        let count = problems
+            .as_slice()
+            .into_iter()
+            .map(|e| (e.r#type.as_str(), e.difficulty.as_str()));
         let counter: Counter<(_, _), usize> = Counter::from_iter(count);
 
         println!("{:?}", counter);
@@ -109,16 +135,16 @@ fn main() {
 }
 
 fn fill_similarity(
-    poems: &mut Vec<Problem>,
+    problems: &mut Vec<Problem>,
     mut problem_similar: HashMap<String, Vec<(String, f64, i32)>>,
 ) {
-    poems.as_mut_slice().into_iter().for_each(|e| {
+    problems.as_mut_slice().into_iter().for_each(|e| {
         if let Some(mut v) = problem_similar.remove(&e.hash) {
             v.sort_by(|a, b| {
                 if a.1 != b.1 {
-                    a.1.partial_cmp(&b.1).unwrap()
+                    a.1.partial_cmp(&b.1).unwrap().reverse()
                 } else {
-                    a.2.partial_cmp(&b.2).unwrap()
+                    a.2.partial_cmp(&b.2).unwrap().reverse()
                 }
             });
 
