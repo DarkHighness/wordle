@@ -1,6 +1,8 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 import '../audio/audio.dart';
 import '../component/wordle_character.dart';
@@ -98,7 +100,11 @@ Future<void> showResultDialogInternal(
               ),
             ),
             InkWell(
-              onTap: () {},
+              onTap: () {
+                Clipboard.setData(ClipboardData(text: problem.hash));
+
+                Fluttertoast.showToast(msg: "已将题目ID复制到剪贴板", toastLength: Toast.LENGTH_SHORT);
+              },
               child: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 4),
                 child: Padding(

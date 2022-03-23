@@ -1,8 +1,7 @@
-const minRandomPoolSizeEasy = 30;
-const minRandomPoolSizeHard = 60;
+const problemChoiceMaxRetries = 10;
 
-const problemPoolSizeEasy = 12;
-const problemPoolSizeHard = 20;
+const problemChoiceSizeEasy = 20;
+const problemChoiceSizeHard = 40;
 
 const gameMaxRetries = 6;
 
@@ -13,10 +12,10 @@ const modeSpeedRunEmergingSecs = 30;
 const modeSpeedRunHintSecs = 15;
 const modeSpeedRunHintSkip = 3;
 
-const poemHintMissingCount = 3;
-const poemHintOccursCount = 3;
-const poemHintAnswerCount = 2;
+const poemHintMissingCount = 6;
+const poemHintOccursCount = 4;
+const poemHintAnswerCount = 4;
 
 const idiomHintMissingCount = 4;
-const idiomHintOccursCount = 2;
-const idiomHintAnswerCount = 2;
+const idiomHintOccursCount = 3;
+const idiomHintAnswerCount = 3;

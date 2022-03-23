@@ -18,12 +18,14 @@ class GamePage extends StatefulWidget {
   final ProblemType problemType;
   final ProblemDifficulty problemDifficulty;
   final GameMode gameMode;
+  final String? initialProblemId;
 
   const GamePage({
     Key? key,
     required this.gameMode,
     required this.problemType,
     required this.problemDifficulty,
+    this.initialProblemId,
   }) : super(key: key);
 
   @override
@@ -54,8 +56,23 @@ class GamePageState extends State<GamePage>
   }
 
   void initGameModel(ProblemDb problemDb) {
-    var gameModel = problemDb.randomGame(
-        widget.gameMode, widget.problemType, widget.problemDifficulty);
+    GameModel gameModel;
+
+    if (widget.initialProblemId != null && _gameModel == null) {
+      if (problemDb.isValidProblem(widget.initialProblemId!)) {
+        gameModel =
+            problemDb.selectGame(widget.initialProblemId!, widget.gameMode);
+      } else {
+        Fluttertoast.showToast(msg: "无效的题目 ID", toastLength: Toast.LENGTH_LONG);
+
+        Navigator.pop(context);
+
+        return;
+      }
+    } else {
+      gameModel = problemDb.randomGame(
+          widget.gameMode, widget.problemType, widget.problemDifficulty);
+    }
 
     gameModel.addListener(() {
       if (gameModel.gameStatus == GameStatus.statusWon ||

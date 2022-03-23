@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg_provider/flutter_svg_provider.dart';
+import 'package:wordle/v2/dialog/text_input_dialog.dart';
 import 'package:wordle/v2/model/game_model.dart';
 import 'package:wordle/v2/model/problem_model.dart';
 import 'package:wordle/v2/page/game_page.dart';
@@ -231,6 +232,45 @@ class _MainPageState extends State<MainPage> {
                   );
                 },
                 child: const Text("竞速挑战"),
+              ),
+            ),
+            SizedBox.fromSize(
+              size: const Size.fromHeight(8),
+            ),
+            SizedBox(
+              width: MediaQuery.of(context).size.width * 0.85,
+              child: ElevatedButton(
+                style: style,
+                onPressed: () {
+                  internalAudioPlayer.play("keypress-standard.mp3");
+
+                  showTextInputDialogInternal(context, title: "题目 ID",
+                      predicate: (e) {
+                    var regex =
+                        RegExp("\\w+", multiLine: true, caseSensitive: false);
+
+                    return regex.hasMatch(e);
+                  }).then((hash) {
+                    if (hash != null) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          settings: const RouteSettings(name: "game"),
+                          builder: (context) {
+                            return GamePage(
+                              initialProblemId: hash,
+                              gameMode: GameMode.modeNormal,
+                              problemType: ProblemType.typeIdiom,
+                              problemDifficulty:
+                                  ProblemDifficulty.difficultyEasy,
+                            );
+                          },
+                        ),
+                      );
+                    }
+                  });
+                },
+                child: const Text("选择题目"),
               ),
             ),
             SizedBox.fromSize(

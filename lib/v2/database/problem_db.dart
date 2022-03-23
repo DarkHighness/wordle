@@ -30,52 +30,59 @@ class ProblemDb {
     }
   }
 
+  bool isValidProblem(String hash) {
+    return _problemMap.containsKey(hash);
+  }
+
   bool isValidInput(String input) {
     return _validInput.contains(input);
   }
 
-  GameModel randomGame(GameMode gameMode, ProblemType problemType,
-      ProblemDifficulty difficulty) {
-    var rand = Random();
-    var idx =
-        rand.nextInt(_problemCategoryMap[problemType]![difficulty]!.length);
+  GameModel selectGame(String problemId, GameMode gameMode) {
+    var problem = _problemMap[problemId]!;
+    var difficulty = problem.difficultyEnum;
+    var problemType = problem.typeEnum;
+    var rand = Random(problemId.codeUnits.reduce((s, e) => s ^ e));
 
-    var hash = _problemCategoryMap[problemType]![difficulty]![idx];
-    var problem = _problemMap[hash]!;
+    Set<Character> choices = {};
+    Set<String> pool = problem.similar.toSet();
 
-    rand = Random(hash.codeUnits.reduce((s, e) => s ^ e));
+    choices.addAll(_problemMap[problemId]!.chars);
 
-    var pool = problem.similar;
+    var choiceSize = difficulty == ProblemDifficulty.difficultyHard
+        ? problemChoiceSizeHard
+        : problemChoiceSizeEasy;
 
-    var minPoolSize = difficulty == ProblemDifficulty.difficultyHard
-        ? minRandomPoolSizeHard
-        : minRandomPoolSizeEasy;
+    var i = 0;
+    var j = 0;
 
-    for (var i = 0;
-        i < pool.length &&
-            pool.length < minPoolSize &&
-            i < randomPoolRetryLimit;
-        i++) {
-      pool.addAll(_problemMap[pool[i]]!.similar);
+    while (choices.length < choiceSize) {
+      if (i < pool.length) {
+        var before = choices.length;
+
+        var hash = pool.elementAt(i);
+        var problem = _problemMap[hash]!;
+
+        pool.addAll(problem.similar);
+        choices.addAll(problem.chars);
+
+        if (before == choices.length && j++ > problemChoiceMaxRetries) {
+          break;
+        }
+
+        i++;
+      } else {
+        var idx =
+            rand.nextInt(_problemCategoryMap[problemType]![difficulty]!.length);
+        var hash = _problemCategoryMap[problemType]![difficulty]![idx];
+
+        pool.add(hash);
+      }
     }
 
-    pool.sort((a, b) => _problemMap[b]!.freq - _problemMap[a]!.freq);
+    var choicesList = choices.toList();
 
-    var poolCnt = difficulty == ProblemDifficulty.difficultyHard
-        ? problemPoolSizeHard
-        : problemPoolSizeEasy;
-
-    pool.shuffle(rand);
-    pool = pool.take(poolCnt).toList();
-    pool.add(hash);
-
-    var choices = pool
-        .expand((e) => _problemMap[e]!.chars)
-        .toSet()
-        .map((e) => InputItem(character: e))
-        .toList(growable: false);
-
-    choices.shuffle(rand);
+    choicesList.shuffle(rand);
 
     List<HintItem> hintItems = [];
 
@@ -100,13 +107,11 @@ class ProblemDb {
           .toList(growable: false);
 
       // 然后按照不出现, 出现, 正确的方式生成提示
-      var hintStage2 = choices
-          .where(
-              (v) => hintAnswers.indexWhere((e) => e.item2 == v.character) < 0)
+      var hintStage2 = choicesList
+          .where((v) => hintAnswers.indexWhere((e) => e.item2 == v) < 0)
           .take(poemHintMissingCount)
           .map((e) => HintItem(
-              hintType: ProblemHintType.hintTypeMissing,
-              hintCharacter: e.character!));
+              hintType: ProblemHintType.hintTypeMissing, hintCharacter: e));
 
       var hintStage3 = hintAnswers
           .where((v) =>
@@ -137,13 +142,11 @@ class ProblemDb {
               hintPosition: e.item1));
 
       // 然后按照不出现, 出现的方式生成提示
-      var hintStage1 = choices
-          .where(
-              (v) => hintAnswers.indexWhere((e) => e.item2 == v.character) < 0)
+      var hintStage1 = choicesList
+          .where((v) => hintAnswers.indexWhere((e) => e.item2 == v) < 0)
           .take(poemHintMissingCount)
           .map((e) => HintItem(
-              hintType: ProblemHintType.hintTypeMissing,
-              hintCharacter: e.character!));
+              hintType: ProblemHintType.hintTypeMissing, hintCharacter: e));
 
       hintAnswers.shuffle(rand);
 
@@ -155,14 +158,27 @@ class ProblemDb {
       hintItems = [...hintStage1, ...hintStage2, ...hintStage3];
     }
 
-    choices.shuffle(rand);
+    choicesList.shuffle(rand);
 
     return GameModel(
         gameMode: gameMode,
         problem: problem,
-        inputChoices: choices,
+        inputChoices: choicesList
+            .map((e) => InputItem(character: e))
+            .toList(growable: false),
         hints: hintItems,
         maxAttempt: gameMaxRetries);
+  }
+
+  GameModel randomGame(GameMode gameMode, ProblemType problemType,
+      ProblemDifficulty difficulty) {
+    var rand = Random();
+    var idx =
+        rand.nextInt(_problemCategoryMap[problemType]![difficulty]!.length);
+
+    var problemId = _problemCategoryMap[problemType]![difficulty]![idx];
+
+    return selectGame(problemId, gameMode);
   }
 }
 
