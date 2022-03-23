@@ -22,7 +22,6 @@ pub struct Problem {
     pub word: String,
     pub hash: String,
     pub difficulty: String,
-    #[serde(skip_serializing, skip_deserializing)]
     pub freq: i32,
     #[serde(skip_serializing, skip_deserializing)]
     pub prop: Counter<char>,
@@ -59,7 +58,7 @@ impl Problem {
             freq,
             prop: counter,
             similar: Vec::new(),
-            r#type
+            r#type,
         }
     }
 
